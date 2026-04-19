@@ -37,6 +37,19 @@ function streamText(text: string) {
   return new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\ndata: [DONE]\n\n`);
 }
 
+function getLocaleInstruction(locale: string) {
+  const language =
+    locale === "ru"
+      ? "Russian"
+      : locale === "uz-cyrl"
+        ? "Uzbek Cyrillic"
+        : locale === "uz"
+          ? "Uzbek Latin"
+          : "English";
+
+  return `The user selected the ${language} interface. Respond in ${language} unless the latest user message is clearly written in a different language or script.`;
+}
+
 function normalizeMessages(messages: unknown[]): ClientMessage[] {
   return messages
     .filter((message): message is ClientMessage => {
@@ -113,7 +126,11 @@ export async function POST(req: NextRequest) {
     const history = buildGeminiHistory(normalizedMessages.slice(0, -1));
     const systemInstruction = {
       role: "system",
-      parts: [{ text: `${HAMROH_SYSTEM_PROMPT}\n\n${HAMROH_RESPONSE_FORMAT_PROMPT}` }],
+      parts: [
+        {
+          text: `${HAMROH_SYSTEM_PROMPT}\n\n${HAMROH_RESPONSE_FORMAT_PROMPT}\n\n${getLocaleInstruction(locale)}`,
+        },
+      ],
     };
 
     const stream = new ReadableStream({
