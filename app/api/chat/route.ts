@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import {
   models,
   HAMROH_SYSTEM_PROMPT,
+  HAMROH_RESPONSE_FORMAT_PROMPT,
   getSafeAiDiagnostic,
   isGeminiConfigured,
   isGeminiConfigError,
@@ -112,7 +113,7 @@ export async function POST(req: NextRequest) {
     const history = buildGeminiHistory(normalizedMessages.slice(0, -1));
     const systemInstruction = {
       role: "system",
-      parts: [{ text: HAMROH_SYSTEM_PROMPT }],
+      parts: [{ text: `${HAMROH_SYSTEM_PROMPT}\n\n${HAMROH_RESPONSE_FORMAT_PROMPT}` }],
     };
 
     const stream = new ReadableStream({

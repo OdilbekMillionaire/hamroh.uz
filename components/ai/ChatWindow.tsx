@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Send, Loader2, Upload, Mic, Volume2, Bot, User } from "lucide-react";
+import FormattedMessage from "@/components/ai/FormattedMessage";
 
 interface Message {
   id: string;
@@ -143,15 +144,15 @@ export default function ChatWindow() {
                   : <User className="w-4 h-4 text-white" />
                 }
               </div>
-              <div className={`max-w-[75%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col gap-1`}>
-                <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+              <div className={`max-w-[78%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col gap-1`}>
+                <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
                   msg.role === "user"
-                    ? "bg-[var(--primary)] text-white rounded-tr-sm"
+                    ? "bg-[var(--primary)] text-white rounded-tr-sm whitespace-pre-wrap"
                     : "bg-white border border-[var(--border)] text-[var(--text-primary)] rounded-tl-sm shadow-sm"
                 }`}>
-                  {msg.content}
-                  {msg.role === "assistant" && (
-                    <button className="mt-2 flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors">
+                  {msg.role === "assistant" ? <FormattedMessage content={msg.content} /> : msg.content}
+                  {msg.role === "assistant" && msg.content.trim().length > 0 && (
+                    <button className="mt-3 flex items-center gap-1 border-t border-[var(--border)] pt-2 text-xs text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors">
                       <Volume2 className="w-3 h-3" />
                       {t("listenBtn")}
                     </button>
