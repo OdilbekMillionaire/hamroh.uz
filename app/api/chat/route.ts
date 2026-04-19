@@ -1,5 +1,22 @@
 import { NextRequest } from "next/server";
-import { models, HAMROH_SYSTEM_PROMPT, isGeminiConfigured, isGeminiConfigError, withFallback } from "@/lib/gemini";
+import {
+  models,
+  HAMROH_SYSTEM_PROMPT,
+  getSafeAiDiagnostic,
+  isGeminiConfigured,
+  isGeminiConfigError,
+  withFallback,
+} from "@/lib/gemini";
+
+type ClientMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+type GeminiHistoryPart = {
+  role: "user" | "model";
+  parts: Array<{ text: string }>;
+};
 
 function getAiUnavailableMessage(locale: string, reason: "config" | "busy") {
   if (reason === "config") {
@@ -19,12 +36,59 @@ function streamText(text: string) {
   return new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\ndata: [DONE]\n\n`);
 }
 
+function normalizeMessages(messages: unknown[]): ClientMessage[] {
+  return messages
+    .filter((message): message is ClientMessage => {
+      if (!message || typeof message !== "object" || !("role" in message) || !("content" in message)) {
+        return false;
+      }
+
+      return (
+        (message.role === "user" || message.role === "assistant") &&
+        typeof message.content === "string"
+      );
+    })
+    .map((message) => ({
+      role: message.role,
+      content: message.content.trim(),
+    }))
+    .filter((message) => message.content.length > 0);
+}
+
+function buildGeminiHistory(messages: ClientMessage[]): GeminiHistoryPart[] {
+  const history: GeminiHistoryPart[] = [];
+  let nextRole: ClientMessage["role"] = "user";
+
+  for (const message of messages) {
+    if (message.role !== nextRole) continue;
+
+    history.push({
+      role: message.role === "assistant" ? "model" : "user",
+      parts: [{ text: message.content }],
+    });
+    nextRole = message.role === "user" ? "assistant" : "user";
+  }
+
+  while (history.at(-1)?.role === "user") {
+    history.pop();
+  }
+
+  return history;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { messages, locale = "en" } = await req.json();
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return Response.json({ error: "No messages provided" }, { status: 400 });
+    }
+
+    const normalizedMessages = normalizeMessages(messages);
+    const lastMessage = normalizedMessages.at(-1);
+
+    if (!lastMessage || lastMessage.role !== "user") {
+      return Response.json({ error: "Last message must be from the user" }, { status: 400 });
     }
 
     if (!isGeminiConfigured()) {
@@ -45,12 +109,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const history = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }));
-
-    const lastMessage = messages[messages.length - 1];
+    const history = buildGeminiHistory(normalizedMessages.slice(0, -1));
     const systemInstruction = {
       role: "system",
       parts: [{ text: HAMROH_SYSTEM_PROMPT }],
@@ -95,7 +154,7 @@ export async function POST(req: NextRequest) {
           ]);
           controller.enqueue(new TextEncoder().encode("data: [DONE]\n\n"));
         } catch (err) {
-          console.error("[AI:chat] failed", err);
+          console.error("[AI:chat] failed", getSafeAiDiagnostic(err));
           controller.enqueue(
             streamText(getAiUnavailableMessage(locale, isGeminiConfigError(err) ? "config" : "busy"))
           );

@@ -21,6 +21,43 @@ export function isGeminiConfigError(error: unknown) {
   return error instanceof Error && (error.name === GEMINI_CONFIG_ERROR || error.message === GEMINI_CONFIG_ERROR);
 }
 
+export type AiErrorKind = "config" | "auth" | "quota" | "model" | "request" | "safety" | "network" | "unknown";
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "";
+}
+
+export function getAiErrorStatus(error: unknown) {
+  const maybeError = error as { status?: unknown; response?: { status?: unknown } };
+  const status = typeof maybeError?.status === "number" ? maybeError.status : maybeError?.response?.status;
+  return typeof status === "number" ? status : undefined;
+}
+
+export function getAiErrorKind(error: unknown): AiErrorKind {
+  if (isGeminiConfigError(error)) return "config";
+
+  const status = getAiErrorStatus(error);
+  const message = getErrorMessage(error).toLowerCase();
+
+  if (status === 401 || status === 403 || /api[_ -]?key|permission|auth|credential/.test(message)) return "auth";
+  if (status === 429 || /quota|rate limit|resource_exhausted/.test(message)) return "quota";
+  if (status === 404 || /model.*not found|not found.*model|unsupported model/.test(message)) return "model";
+  if (status === 400 || /first content|history|role|invalid argument|bad request/.test(message)) return "request";
+  if (/safety|blocked|harm/.test(message)) return "safety";
+  if (/fetch failed|network|timeout|econnreset|enotfound/.test(message)) return "network";
+
+  return "unknown";
+}
+
+export function getSafeAiDiagnostic(error: unknown) {
+  return {
+    kind: getAiErrorKind(error),
+    status: getAiErrorStatus(error),
+  };
+}
+
 const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
   { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
