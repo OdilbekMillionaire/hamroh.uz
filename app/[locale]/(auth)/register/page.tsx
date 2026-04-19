@@ -1,15 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Phone, ArrowRight, Loader2, Globe } from "lucide-react";
+import { RecaptchaVerifier, signInWithPhoneNumber, updateProfile } from "firebase/auth";
+import type { ConfirmationResult } from "firebase/auth";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
+import { auth, db } from "@/lib/firebase";
 
 const COUNTRIES = [
   "Russia", "South Korea", "Turkey", "UAE", "Germany", "USA",
   "Kazakhstan", "Kyrgyzstan", "Poland", "Czech Republic", "Other",
 ];
+
+function normalizePhoneNumber(value: string) {
+  const normalized = value.trim().replace(/[^\d+]/g, "");
+  return normalized.startsWith("+") ? normalized : `+${normalized}`;
+}
+
+function getAuthErrorMessage(error: unknown) {
+  const code =
+    typeof error === "object" && error && "code" in error
+      ? String((error as { code?: unknown }).code)
+      : "";
+
+  if (code === "auth/invalid-phone-number") return "Please enter a valid phone number with country code.";
+  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a bit and try again.";
+  if (code === "auth/code-expired") return "This code expired. Please request a new one.";
+  if (code === "auth/invalid-verification-code") return "The verification code is not correct.";
+  if (code === "auth/quota-exceeded") return "SMS quota is exceeded for now. Try a Firebase test number or wait.";
+
+  return "Firebase could not complete this request. Please try again.";
+}
 
 export default function RegisterPage() {
   const t = useTranslations();
@@ -20,19 +44,71 @@ export default function RegisterPage() {
   const [country, setCountry] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const recaptchaVerifier = useRef<RecaptchaVerifier | null>(null);
+
+  function getRecaptchaVerifier() {
+    if (!recaptchaVerifier.current) {
+      recaptchaVerifier.current = new RecaptchaVerifier(auth, "register-recaptcha-container", {
+        size: "normal",
+      });
+    }
+
+    return recaptchaVerifier.current;
+  }
+
+  function resetRecaptcha() {
+    recaptchaVerifier.current?.clear();
+    recaptchaVerifier.current = null;
+  }
 
   async function handleRegister() {
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    setStep("otp");
+    try {
+      auth.languageCode = locale === "uz-cyrl" ? "uz" : locale;
+      const result = await signInWithPhoneNumber(auth, normalizePhoneNumber(phone), getRecaptchaVerifier());
+      setConfirmationResult(result);
+      setStep("otp");
+    } catch (err) {
+      resetRecaptcha();
+      setError(getAuthErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleVerify() {
+    if (!confirmationResult) {
+      setError("Please request a verification code first.");
+      setStep("info");
+      return;
+    }
+
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    window.location.href = `/${locale}/dashboard`;
+    try {
+      const credential = await confirmationResult.confirm(otp);
+      await updateProfile(credential.user, { displayName: name });
+      await setDoc(
+        doc(db, "users", credential.user.uid),
+        {
+          displayName: name,
+          phoneNumber: credential.user.phoneNumber,
+          country,
+          preferredLocale: locale,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      window.location.href = `/${locale}/dashboard`;
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -53,6 +129,12 @@ export default function RegisterPage() {
           <p className="text-[var(--text-muted)] text-sm text-center mb-6">
             Create your HamrohUz account
           </p>
+
+          {error && (
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
 
           {step === "info" ? (
             <div className="space-y-4">
@@ -103,6 +185,7 @@ export default function RegisterPage() {
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
                 {t("auth.sendOtp")}
               </button>
+              <div id="register-recaptcha-container" className="min-h-[78px]" />
             </div>
           ) : (
             <div className="space-y-4">

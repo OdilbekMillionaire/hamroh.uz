@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Nunito } from "next/font/google";
+import FirebaseAnalytics from "@/components/analytics/FirebaseAnalytics";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -79,7 +80,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="uz" className={`${jakarta.variable} ${nunito.variable}`}>
-      <body className="min-h-screen bg-[#FFFFFF] antialiased">{children}</body>
+      <body className="min-h-screen bg-[#FFFFFF] antialiased">
+        <FirebaseAnalytics />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,10 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Phone, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import type { ConfirmationResult } from "firebase/auth";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
+import { auth, db } from "@/lib/firebase";
+
+function normalizePhoneNumber(value: string) {
+  const phone = value.trim().replace(/[^\d+]/g, "");
+  return phone.startsWith("+") ? phone : `+${phone}`;
+}
+
+function getAuthErrorMessage(error: unknown) {
+  const code =
+    typeof error === "object" && error && "code" in error
+      ? String((error as { code?: unknown }).code)
+      : "";
+
+  if (code === "auth/invalid-phone-number") return "Please enter a valid phone number with country code.";
+  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a bit and try again.";
+  if (code === "auth/code-expired") return "This code expired. Please request a new one.";
+  if (code === "auth/invalid-verification-code") return "The verification code is not correct.";
+  if (code === "auth/quota-exceeded") return "SMS quota is exceeded for now. Try a Firebase test number or wait.";
+
+  return "Firebase could not complete this request. Please try again.";
+}
 
 export default function LoginPage() {
   const t = useTranslations();
@@ -14,19 +38,71 @@ export default function LoginPage() {
   const [value, setValue] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const recaptchaVerifier = useRef<RecaptchaVerifier | null>(null);
+
+  function getRecaptchaVerifier() {
+    if (!recaptchaVerifier.current) {
+      recaptchaVerifier.current = new RecaptchaVerifier(auth, "login-recaptcha-container", {
+        size: "normal",
+      });
+    }
+
+    return recaptchaVerifier.current;
+  }
+
+  function resetRecaptcha() {
+    recaptchaVerifier.current?.clear();
+    recaptchaVerifier.current = null;
+  }
 
   async function handleSend() {
+    if (method === "email") {
+      setError("Email login is not enabled yet. Please use phone login.");
+      return;
+    }
+
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    setStep("otp");
+    try {
+      auth.languageCode = locale === "uz-cyrl" ? "uz" : locale;
+      const result = await signInWithPhoneNumber(auth, normalizePhoneNumber(value), getRecaptchaVerifier());
+      setConfirmationResult(result);
+      setStep("otp");
+    } catch (err) {
+      resetRecaptcha();
+      setError(getAuthErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleVerify() {
+    if (!confirmationResult) {
+      setError("Please request a verification code first.");
+      setStep("input");
+      return;
+    }
+
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    window.location.href = `/${locale}/dashboard`;
+    try {
+      const credential = await confirmationResult.confirm(otp);
+      await setDoc(
+        doc(db, "users", credential.user.uid),
+        {
+          phoneNumber: credential.user.phoneNumber,
+          lastLoginAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+      window.location.href = `/${locale}/dashboard`;
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -47,6 +123,12 @@ export default function LoginPage() {
           <p className="text-[var(--text-muted)] text-sm text-center mb-6">
             Welcome back to HamrohUz
           </p>
+
+          {error && (
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
 
           <div className="flex gap-2 mb-6 bg-[var(--bg-subtle)] rounded-xl p-1">
             {(["phone", "email"] as const).map((m) => (
@@ -85,6 +167,7 @@ export default function LoginPage() {
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
                 {t("auth.sendOtp")}
               </button>
+              {method === "phone" && <div id="login-recaptcha-container" className="min-h-[78px]" />}
             </div>
           ) : (
             <div className="space-y-4">
@@ -106,7 +189,14 @@ export default function LoginPage() {
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                 {t("auth.verifyOtp")}
               </button>
-              <button onClick={() => setStep("input")} className="w-full text-sm text-[var(--text-muted)] hover:text-[var(--primary)]">
+              <button
+                onClick={() => {
+                  resetRecaptcha();
+                  setConfirmationResult(null);
+                  setStep("input");
+                }}
+                className="w-full text-sm text-[var(--text-muted)] hover:text-[var(--primary)]"
+              >
                 {t("common.back")}
               </button>
             </div>
