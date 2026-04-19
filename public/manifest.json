@@ -1,0 +1,39 @@
+{
+  "name": "HamrohUz — Legal Protection Abroad",
+  "short_name": "HamrohUz",
+  "description": "AI-powered legal assistance, petition tracking, and consular support for Uzbek citizens abroad.",
+  "start_url": "/uz",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0E6E7E",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["legal", "utilities", "productivity"],
+  "lang": "uz",
+  "dir": "ltr",
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Ask Hamroh AI",
+      "url": "/uz/ai-assistant",
+      "description": "Open AI legal assistant"
+    },
+    {
+      "name": "New Petition",
+      "url": "/uz/petitions/new",
+      "description": "File a new petition"
+    },
+    {
+      "name": "Live News",
+      "url": "/uz/news",
+      "description": "Latest news for Uzbeks abroad"
+    }
+  ]
+}

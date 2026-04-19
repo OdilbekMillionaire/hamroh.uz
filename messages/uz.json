@@ -1,0 +1,225 @@
+{
+  "common": {
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "loading": "Yuklanmoqda...",
+    "error": "Xato",
+    "back": "Orqaga",
+    "submit": "Yuborish",
+    "search": "Qidirish",
+    "filter": "Filtr",
+    "close": "Yopish",
+    "retry": "Qayta urinish"
+  },
+  "nav": {
+    "home": "Bosh sahifa",
+    "petitions": "Murojaatlar",
+    "aiAssistant": "Hamroh AI",
+    "content": "Huquqiy kontent",
+    "maps": "Xaritalar",
+    "translator": "Tarjimon",
+    "voice": "Ovozli rejim",
+    "profile": "Profil",
+    "news": "Jonli Yangiliklar",
+    "logout": "Chiqish"
+  },
+  "home": {
+    "hero": {
+      "title": "Chet eldagi o'zbeklar uchun huquqiy himoya",
+      "subtitle": "Sun'iy intellekt asosidagi huquqiy yordam, murojaat kuzatuvi va chet el fuqarolari uchun konsullik yordami.",
+      "ctaPrimary": "Bepul boshlash",
+      "ctaSecondary": "Ko'proq bilish"
+    },
+    "stats": {
+      "citizens": "9M+ fuqaro chetda",
+      "migrants": "1.3M mehnat muhojiri",
+      "students": "30K+ talaba"
+    },
+    "features": {
+      "title": "Hamma narsa bir joyda"
+    },
+    "howItWorks": {
+      "title": "Qanday ishlaydi",
+      "step1": "Hisob yarating va joriy mamlakatni belgilang",
+      "step2": "Hamroh AIga huquqiy vaziyatingizni tavsiflang",
+      "step3": "Maslahat oling, murojaat tuzing va jarayonni kuzating"
+    }
+  },
+  "petitions": {
+    "title": "Murojaatlarim",
+    "new": "Yangi murojaat",
+    "myPetitions": "Murojaatlarim",
+    "statuses": {
+      "sent": "Yuborildi",
+      "received": "Qabul qilindi",
+      "reviewing": "Ko'rib chiqilmoqda",
+      "resolved": "Hal qilindi"
+    },
+    "categories": {
+      "migration": "Migratsiya",
+      "labor": "Mehnat huquqi",
+      "emergency": "Favqulodda holat",
+      "document": "Hujjatlar",
+      "other": "Boshqa"
+    },
+    "aiScan": {
+      "title": "AI xavf tekshiruvi",
+      "scanning": "Murojaat tekshirilmoqda...",
+      "risks": "Aniqlangan xavflar",
+      "recommendations": "Tavsiyalar",
+      "urgency": "Shoshilinchlik darajasi"
+    },
+    "draft": {
+      "generateBtn": "AI yordamida yaratish",
+      "generating": "Qoralama yaratilmoqda...",
+      "disclaimer": "AI tomonidan yaratilgan qoralama. Yuborishdan oldin tekshiring."
+    },
+    "form": {
+      "title": "Murojaat sarlavhasi",
+      "description": "Vaziyatingizni batafsil tavsiflang",
+      "category": "Kategoriya",
+      "attachFiles": "Fayllarni biriktirish"
+    }
+  },
+  "ai": {
+    "title": "Hamroh AI — Huquqiy Yordamchi",
+    "placeholder": "Huquqiy vaziyatingiz haqida savol bering...",
+    "voiceMode": "Ovozli rejim",
+    "listenBtn": "Eshitish",
+    "analyzing": "Hujjat tahlil qilinmoqda...",
+    "uploadDoc": "AI tahlili uchun hujjat yuklang (PDF, JPG, PNG)",
+    "uploadDocBtn": "Hujjat yuklash",
+    "quickActions": [
+      "Shartnomamni tahlil qil",
+      "Huquqlarimni bilmoqchiman",
+      "Ariza tayyorla",
+      "Qayerga murojaat qilishim kerak?"
+    ],
+    "disclaimer": "Hamroh AI faqat ma'lumot maqsadida bo'lib, litsenziyalangan huquqiy maslahatni almashtirmaydi.",
+    "busyMsg": "AI hozirda band. Biroz kutib qayta urinib ko'ring."
+  },
+  "voice": {
+    "title": "Jonli ovozli rejim",
+    "holdToSpeak": "Gapirish uchun bosib turing",
+    "release": "Yuborish uchun qo'yib yuboring",
+    "listening": "Tinglayapman...",
+    "responding": "Hamroh AI javob berayapti...",
+    "endSession": "Seansni tugatish",
+    "saveTranscript": "Matnni saqlash"
+  },
+  "translator": {
+    "title": "Hamroh Tarjimon",
+    "textTab": "Matn",
+    "docTab": "Hujjat",
+    "liveTab": "Jonli",
+    "inputPlaceholder": "Tarjima qilish uchun matn kiriting...",
+    "outputPlaceholder": "Tarjima bu yerda paydo bo'ladi...",
+    "speakBtn": "O'qish",
+    "copyBtn": "Nusxa olish",
+    "downloadBtn": "Yuklab olish",
+    "liveStart": "Jonli tarjimani boshlash",
+    "liveStop": "To'xtatish"
+  },
+  "maps": {
+    "legal": {
+      "title": "Yuridik xizmatlar xaritasi",
+      "filters": {
+        "all": "Barchasi",
+        "police": "Politsiya",
+        "hospital": "Kasalxona",
+        "lawyer": "Advokat",
+        "embassy": "Elchixona"
+      },
+      "searchPlaceholder": "Joylashuvni qidirish..."
+    },
+    "security": {
+      "title": "Xavfsizlik xaritasi",
+      "levels": {
+        "danger": "Xavfli",
+        "caution": "Ehtiyot bo'ling",
+        "safe": "Xavfsiz"
+      },
+      "lastUpdated": "Oxirgi yangilanish",
+      "sources": "Manbalar"
+    }
+  },
+  "content": {
+    "title": "Huquqiy kontent",
+    "save": "Saqlash",
+    "saved": "Saqlangan",
+    "share": "Ulashish",
+    "readMore": "Ko'proq o'qish",
+    "aiSummary": "AI xulosasi",
+    "filters": {
+      "all": "Barchasi",
+      "article": "Maqolalar",
+      "video": "Videolar",
+      "infographic": "Infografika",
+      "news": "Yangiliklar"
+    }
+  },
+  "auth": {
+    "login": "Kirish",
+    "register": "Ro'yxatdan o'tish",
+    "phone": "Telefon raqami",
+    "email": "Email manzil",
+    "sendOtp": "Kod yuborish",
+    "verifyOtp": "Tasdiqlash",
+    "otpPlaceholder": "6 xonali kodni kiriting",
+    "noAccount": "Hisobingiz yo'qmi?",
+    "haveAccount": "Hisobingiz bormi?"
+  },
+  "profile": {
+    "title": "Mening profilim",
+    "editInfo": "Tahrirlash",
+    "notifications": "Bildirishnomalar",
+    "language": "Til",
+    "country": "Joriy mamlakat",
+    "myPetitions": "Murojaatlarim",
+    "savedContent": "Saqlangan kontent"
+  },
+  "news": {
+    "title": "Jonli Yangiliklar",
+    "subtitle": "Chet elda yashovchi o'zbek fuqarolar uchun dolzarb yangiliklar",
+    "searchPlaceholder": "Yangiliklar qidirish...",
+    "filters": {
+      "all": "Barcha mavzular",
+      "labor": "Mehnat va migratsiya",
+      "legal": "Huquq va qonun",
+      "uzbekistan": "O'zbekiston",
+      "visa": "Viza va sayohat",
+      "safety": "Xavfsizlik",
+      "economy": "Iqtisodiyot"
+    },
+    "countries": {
+      "all": "Barcha mamlakatlar",
+      "russia": "Rossiya",
+      "korea": "Janubiy Koreya",
+      "turkey": "Turkiya",
+      "uae": "BAA",
+      "germany": "Germaniya",
+      "usa": "AQSh"
+    },
+    "sortBy": "Saralash",
+    "sortOptions": {
+      "newest": "Eng yangilari",
+      "relevance": "Dolzarblik bo'yicha"
+    },
+    "readFull": "To'liq o'qish",
+    "source": "Manba",
+    "noResults": "Filtrlarga mos yangiliklar topilmadi",
+    "loadMore": "Ko'proq yuklash",
+    "aiSummary": "AI xulosasi",
+    "publishedAt": "E'lon qilingan",
+    "loading": "So'nggi yangiliklar yuklanmoqda...",
+    "error": "Yangiliklar yuklanmadi. Qayta urinib ko'ring."
+  },
+  "errors": {
+    "generic": "Xato yuz berdi. Qayta urinib ko'ring.",
+    "network": "Tarmoq xatosi. Internetni tekshiring.",
+    "authRequired": "Davom etish uchun tizimga kiring.",
+    "fileTooLarge": "Fayl hajmi juda katta. Maksimum 10MB.",
+    "invalidFileType": "Faqat PDF, JPG va PNG fayllar ruxsat etiladi.",
+    "aiBusy": "AI band. Biroz kutib qayta urinib ko'ring."
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "error": "Error",
+    "back": "Back",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "close": "Close",
+    "retry": "Retry"
+  },
+  "nav": {
+    "home": "Home",
+    "petitions": "Petitions",
+    "aiAssistant": "Hamroh AI",
+    "content": "Legal Content",
+    "maps": "Maps",
+    "translator": "Translator",
+    "voice": "Voice Mode",
+    "profile": "Profile",
+    "news": "Live News",
+    "logout": "Logout"
+  },
+  "home": {
+    "hero": {
+      "title": "Legal Protection for Uzbeks Abroad",
+      "subtitle": "AI-powered legal assistance, petition tracking, and consular support for Uzbek citizens living and working abroad.",
+      "ctaPrimary": "Get Started Free",
+      "ctaSecondary": "Learn More"
+    },
+    "stats": {
+      "citizens": "9M+ Citizens Abroad",
+      "migrants": "1.3M Labor Migrants",
+      "students": "30K+ Students"
+    },
+    "features": {
+      "title": "Everything You Need, In One Place"
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "step1": "Create your account and set your current country",
+      "step2": "Describe your legal situation to Hamroh AI",
+      "step3": "Get guidance, draft petitions, and track progress"
+    }
+  },
+  "petitions": {
+    "title": "My Petitions",
+    "new": "New Petition",
+    "myPetitions": "My Petitions",
+    "statuses": {
+      "sent": "Sent",
+      "received": "Received",
+      "reviewing": "Under Review",
+      "resolved": "Resolved"
+    },
+    "categories": {
+      "migration": "Migration",
+      "labor": "Labor Rights",
+      "emergency": "Emergency",
+      "document": "Documents",
+      "other": "Other"
+    },
+    "aiScan": {
+      "title": "AI Risk Scan",
+      "scanning": "Scanning your petition...",
+      "risks": "Risks Identified",
+      "recommendations": "Recommendations",
+      "urgency": "Urgency Level"
+    },
+    "draft": {
+      "generateBtn": "Generate with AI",
+      "generating": "Generating draft...",
+      "disclaimer": "AI-generated draft. Please review before submitting."
+    },
+    "form": {
+      "title": "Petition Title",
+      "description": "Describe your situation in detail",
+      "category": "Category",
+      "attachFiles": "Attach Files"
+    }
+  },
+  "ai": {
+    "title": "Hamroh AI — Legal Assistant",
+    "placeholder": "Ask me anything about your legal situation...",
+    "voiceMode": "Voice Mode",
+    "listenBtn": "Listen",
+    "analyzing": "Analyzing your document...",
+    "uploadDoc": "Upload a document for AI analysis (PDF, JPG, PNG)",
+    "uploadDocBtn": "Upload Document",
+    "quickActions": [
+      "Analyze my contract",
+      "What are my rights?",
+      "Draft an application",
+      "Where should I go?"
+    ],
+    "disclaimer": "Hamroh AI is for informational purposes only and does not replace licensed legal advice.",
+    "busyMsg": "AI is currently busy. Please try again in a moment."
+  },
+  "voice": {
+    "title": "Live Voice Mode",
+    "holdToSpeak": "Hold to Speak",
+    "release": "Release to Send",
+    "listening": "Listening...",
+    "responding": "Hamroh AI is responding...",
+    "endSession": "End Session",
+    "saveTranscript": "Save Transcript"
+  },
+  "translator": {
+    "title": "Hamroh Translator",
+    "textTab": "Text",
+    "docTab": "Document",
+    "liveTab": "Live",
+    "inputPlaceholder": "Enter text to translate...",
+    "outputPlaceholder": "Translation will appear here...",
+    "speakBtn": "Speak",
+    "copyBtn": "Copy",
+    "downloadBtn": "Download",
+    "liveStart": "Start Live Translation",
+    "liveStop": "Stop"
+  },
+  "maps": {
+    "legal": {
+      "title": "Legal Services Map",
+      "filters": {
+        "all": "All",
+        "police": "Police",
+        "hospital": "Hospital",
+        "lawyer": "Lawyer",
+        "embassy": "Embassy"
+      },
+      "searchPlaceholder": "Search location..."
+    },
+    "security": {
+      "title": "Security Map",
+      "levels": {
+        "danger": "Danger",
+        "caution": "Caution",
+        "safe": "Safe"
+      },
+      "lastUpdated": "Last updated",
+      "sources": "Sources"
+    }
+  },
+  "content": {
+    "title": "Legal Content",
+    "save": "Save",
+    "saved": "Saved",
+    "share": "Share",
+    "readMore": "Read More",
+    "aiSummary": "AI Summary",
+    "filters": {
+      "all": "All",
+      "article": "Articles",
+      "video": "Videos",
+      "infographic": "Infographics",
+      "news": "News"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "phone": "Phone Number",
+    "email": "Email Address",
+    "sendOtp": "Send Code",
+    "verifyOtp": "Verify",
+    "otpPlaceholder": "Enter 6-digit code",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?"
+  },
+  "profile": {
+    "title": "My Profile",
+    "editInfo": "Edit Info",
+    "notifications": "Notifications",
+    "language": "Language",
+    "country": "Current Country",
+    "myPetitions": "My Petitions",
+    "savedContent": "Saved Content"
+  },
+  "news": {
+    "title": "Live News",
+    "subtitle": "Real-time news relevant to Uzbek citizens abroad",
+    "searchPlaceholder": "Search news...",
+    "filters": {
+      "all": "All Topics",
+      "labor": "Labor & Migration",
+      "legal": "Legal & Rights",
+      "uzbekistan": "Uzbekistan",
+      "visa": "Visa & Travel",
+      "safety": "Safety & Security",
+      "economy": "Economy"
+    },
+    "countries": {
+      "all": "All Countries",
+      "russia": "Russia",
+      "korea": "South Korea",
+      "turkey": "Turkey",
+      "uae": "UAE",
+      "germany": "Germany",
+      "usa": "USA"
+    },
+    "sortBy": "Sort by",
+    "sortOptions": {
+      "newest": "Newest first",
+      "relevance": "Most relevant"
+    },
+    "readFull": "Read full article",
+    "source": "Source",
+    "noResults": "No news found for your filters",
+    "loadMore": "Load more",
+    "aiSummary": "AI Summary",
+    "publishedAt": "Published",
+    "loading": "Loading latest news...",
+    "error": "Could not load news. Please try again."
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Check your connection.",
+    "authRequired": "Please login to continue.",
+    "fileTooLarge": "File too large. Max 10MB allowed.",
+    "invalidFileType": "Only PDF, JPG, and PNG files are allowed.",
+    "aiBusy": "AI is busy. Please try again shortly."
+  }
+}
