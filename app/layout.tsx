@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | HamrohUz",
   },
   description:
-    "AI-powered legal assistance, petition tracking, smart maps, and consular support for Uzbek citizens living and working abroad. Powered by Google Gemini AI.",
+    "AI-powered legal assistance, petition tracking, smart maps, and consular support for Uzbek citizens living and working abroad. Powered by lawify.uz.",
   keywords: [
     "uzbekistan", "legal help", "migrants rights", "labor rights", "AI legal assistant",
     "petition", "konsullik", "huquqiy yordam", "мигранты", "юридическая помощь",

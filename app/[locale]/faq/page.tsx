@@ -55,7 +55,7 @@ const FAQS = [
       },
       {
         q: "Can AI write my petition for me?",
-        a: "Yes. Click 'Generate with AI' in the petition form. Hamroh AI (using Gemini) will draft a formal petition based on your description, properly addressed and formatted. You can edit it before submitting.",
+        a: "Yes. Click 'Generate with AI' in the petition form. Hamroh AI will draft a formal petition based on your description, properly addressed and formatted. You can edit it before submitting.",
       },
     ],
   },

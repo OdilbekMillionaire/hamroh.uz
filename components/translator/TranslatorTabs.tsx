@@ -160,7 +160,7 @@ export default function TranslatorTabs() {
           <h2 className="text-xl font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: "var(--font-jakarta)" }}>
             Live Translator
           </h2>
-          <p className="text-sm text-[var(--text-secondary)] mb-6">Real-time spoken translation powered by Gemini Live</p>
+          <p className="text-sm text-[var(--text-secondary)] mb-6">Real-time spoken translation powered by lawify.uz</p>
           <button
             onClick={() => setLiveActive(!liveActive)}
             className={`px-8 py-3 rounded-xl font-semibold text-sm transition-all ${

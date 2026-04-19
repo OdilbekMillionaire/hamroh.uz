@@ -93,7 +93,7 @@ export default function LandingHero({ locale }: { locale: string }) {
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 bg-white/20 text-white text-sm font-medium px-4 py-2 rounded-lg mb-6 backdrop-blur-sm">
             <span className="w-2 h-2 bg-[#2ECC71] rounded-full animate-pulse" />
-            Powered by Google Gemini AI
+            {t("poweredBy")}
           </div>
           <h1
             className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight max-w-3xl"

@@ -15,7 +15,7 @@ const features = (locale: string) => [
   {
     icon: Bot,
     titleEn: "AI Legal Assistant",
-    desc: "24/7 legal consultation powered by Gemini AI. Analyze documents, understand rights, draft applications.",
+    desc: "24/7 legal consultation powered by lawify.uz. Analyze documents, understand rights, draft applications.",
     href: `/${locale}/ai-assistant`,
     color: "bg-[#E8F4F6] text-[#0E6E7E]",
   },

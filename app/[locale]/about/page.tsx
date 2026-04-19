@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const VALUES = [
   { icon: Shield, title: "Protection First", desc: "Every Uzbek citizen abroad deserves access to legal protection, regardless of income or location." },
-  { icon: Bot, title: "AI-Powered", desc: "Google Gemini AI provides real-time legal guidance in all 4 languages — Uzbek, Russian, English, and Uzbek Cyrillic." },
+  { icon: Bot, title: "AI-Powered", desc: "lawify.uz provides real-time legal guidance in all 4 languages — Uzbek, Russian, English, and Uzbek Cyrillic." },
   { icon: Globe, title: "Global Reach", desc: "Covering 50+ countries where Uzbek citizens live and work, with localized legal intelligence for each." },
   { icon: Heart, title: "Human-Centered", desc: "Technology serves people. Every feature is designed around the real needs of migrants, students, and travelers." },
 ];
@@ -64,7 +64,7 @@ export default function AboutPage() {
               migration complications, and lack access to affordable legal help.
             </p>
             <p className="text-[#4A6274] text-lg leading-relaxed">
-              HamrohUz bridges this gap by combining Google Gemini AI with multilingual legal
+              HamrohUz bridges this gap by combining lawify.uz AI with multilingual legal
               knowledge to provide instant, accessible, and affordable guidance — from filing
               petitions to understanding labor rights to finding emergency consular contacts.
             </p>

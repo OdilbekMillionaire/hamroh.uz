@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
           ]);
           controller.enqueue(new TextEncoder().encode("data: [DONE]\n\n"));
         } catch (err) {
-          console.error("[Gemini:chat] failed", err);
+          console.error("[AI:chat] failed", err);
           controller.enqueue(
             streamText(getAiUnavailableMessage(locale, isGeminiConfigError(err) ? "config" : "busy"))
           );

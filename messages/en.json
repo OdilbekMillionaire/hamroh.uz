@@ -27,6 +27,7 @@
     "hero": {
       "title": "Legal Protection for Uzbeks Abroad",
       "subtitle": "AI-powered legal assistance, petition tracking, and consular support for Uzbek citizens living and working abroad.",
+      "poweredBy": "Powered by lawify.uz",
       "ctaPrimary": "Get Started Free",
       "ctaSecondary": "Learn More"
     },

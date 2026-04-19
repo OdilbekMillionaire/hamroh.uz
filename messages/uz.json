@@ -27,6 +27,7 @@
     "hero": {
       "title": "Chet eldagi o'zbeklar uchun huquqiy himoya",
       "subtitle": "Sun'iy intellekt asosidagi huquqiy yordam, murojaat kuzatuvi va chet el fuqarolari uchun konsullik yordami.",
+      "poweredBy": "lawify.uz tomonidan quvvatlanadi",
       "ctaPrimary": "Bepul boshlash",
       "ctaSecondary": "Ko'proq bilish"
     },

@@ -29,7 +29,7 @@ export default function VoicePage() {
                 <h1 className="font-bold text-[var(--text-primary)]" style={{ fontFamily: "var(--font-jakarta)" }}>
                   {t("title")}
                 </h1>
-                <p className="text-xs text-[var(--text-muted)]">Powered by Gemini Live Audio</p>
+                <p className="text-xs text-[var(--text-muted)]">Powered by lawify.uz</p>
               </div>
             </div>
           </div>

@@ -74,7 +74,7 @@ export default function SecurityMap() {
       <div className="mt-6 p-4 bg-[var(--bg-subtle)] rounded-xl text-xs text-[var(--text-muted)] flex items-start gap-2">
         <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
         <p>
-          Security data is AI-generated and updated daily using Gemini Deep Research. It is for informational
+          Security data is AI-generated and updated daily. It is for informational
           purposes only. Always check official government travel advisories for your specific situation.
         </p>
       </div>
