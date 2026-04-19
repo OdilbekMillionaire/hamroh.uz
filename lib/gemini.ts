@@ -127,7 +127,7 @@ export async function withFallback<T>(
       const error = err as { status?: number; message?: string };
       if (i < attempts.length - 1) {
         console.warn(
-          `[Gemini:${label}] attempt ${i + 1} failed (${error?.status || "unknown"}), falling back`
+          `[AI:${label}] attempt ${i + 1} failed (${error?.status || "unknown"}), falling back`
         );
         await new Promise((r) => setTimeout(r, 500 * (i + 1)));
         continue;
@@ -135,5 +135,5 @@ export async function withFallback<T>(
       throw err;
     }
   }
-  throw lastError instanceof Error ? lastError : new Error(`[Gemini:${label}] All fallbacks exhausted`);
+  throw lastError instanceof Error ? lastError : new Error(`[AI:${label}] All fallbacks exhausted`);
 }

@@ -20,10 +20,10 @@ type GeminiHistoryPart = {
 
 function getAiUnavailableMessage(locale: string, reason: "config" | "busy") {
   if (reason === "config") {
-    if (locale === "ru") return "AI-сервис пока не настроен. Добавьте GEMINI_API_KEY в переменные окружения Vercel.";
-    if (locale === "uz-cyrl") return "AI хизмати ҳали созланмаган. Vercel environment variables қисмига GEMINI_API_KEY қўшинг.";
-    if (locale === "uz") return "AI xizmati hali sozlanmagan. Vercel environment variables bo'limiga GEMINI_API_KEY qo'shing.";
-    return "AI service is not configured yet. Add GEMINI_API_KEY in Vercel environment variables.";
+    if (locale === "ru") return "AI-сервис пока не настроен. Пожалуйста, повторите попытку позже.";
+    if (locale === "uz-cyrl") return "AI хизмати ҳали созланмаган. Илтимос, кейинроқ қайта уриниб кўринг.";
+    if (locale === "uz") return "AI xizmati hali sozlanmagan. Iltimos, keyinroq qayta urinib ko'ring.";
+    return "AI service is not configured yet. Please try again later.";
   }
 
   if (locale === "ru") return "AI сейчас занят. Пожалуйста, попробуйте еще раз.";
