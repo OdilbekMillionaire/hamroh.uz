@@ -67,6 +67,10 @@ firebase deploy --only firestore:rules,storage
 
 Phone auth is used by the login and register pages. In Firebase Console, enable **Authentication > Sign-in method > Phone**, add your production domains under **Authentication > Settings > Authorized domains**, and add at least one test phone number while developing to avoid SMS quota issues.
 
+## AI Assistant
+
+Hamroh AI uses the server-only `GEMINI_API_KEY`. Add it in Vercel Project Settings before deploying; without it, `/api/chat` will return a setup message instead of an AI answer. Do not commit this key to the repository.
+
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

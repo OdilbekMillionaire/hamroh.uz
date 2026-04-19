@@ -1,6 +1,25 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const GEMINI_CONFIG_ERROR = "GEMINI_API_KEY_MISSING";
+
+function getGenAI() {
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  if (!apiKey) {
+    const error = new Error(GEMINI_CONFIG_ERROR);
+    error.name = GEMINI_CONFIG_ERROR;
+    throw error;
+  }
+
+  return new GoogleGenerativeAI(apiKey);
+}
+
+export function isGeminiConfigured() {
+  return Boolean(process.env.GEMINI_API_KEY?.trim());
+}
+
+export function isGeminiConfigError(error: unknown) {
+  return error instanceof Error && (error.name === GEMINI_CONFIG_ERROR || error.message === GEMINI_CONFIG_ERROR);
+}
 
 const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -9,25 +28,25 @@ const safetySettings = [
 ];
 
 export const models = {
-  flashLite:   () => genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite", safetySettings }),
-  flash2:      () => genAI.getGenerativeModel({ model: "gemini-2.0-flash", safetySettings }),
-  flashLite25: () => genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite", safetySettings }),
-  flash25:     () => genAI.getGenerativeModel({ model: "gemini-2.5-flash", safetySettings }),
-  flash31Lite: () => genAI.getGenerativeModel({ model: "gemini-2.0-flash", safetySettings }),
-  flash31:     () => genAI.getGenerativeModel({ model: "gemini-2.0-flash", safetySettings }),
-  pro25:       () => genAI.getGenerativeModel({ model: "gemini-2.5-pro", safetySettings }),
-  pro31:       () => genAI.getGenerativeModel({ model: "gemini-2.5-pro", safetySettings }),
-  embedding:   () => genAI.getGenerativeModel({ model: "text-embedding-004" }),
-  embeddingFb: () => genAI.getGenerativeModel({ model: "text-embedding-004" }),
+  flashLite:   () => getGenAI().getGenerativeModel({ model: "gemini-2.5-flash-lite", safetySettings }),
+  flash2:      () => getGenAI().getGenerativeModel({ model: "gemini-2.5-flash-lite", safetySettings }),
+  flashLite25: () => getGenAI().getGenerativeModel({ model: "gemini-2.5-flash-lite", safetySettings }),
+  flash25:     () => getGenAI().getGenerativeModel({ model: "gemini-2.5-flash", safetySettings }),
+  flash31Lite: () => getGenAI().getGenerativeModel({ model: "gemini-2.5-flash-lite", safetySettings }),
+  flash31:     () => getGenAI().getGenerativeModel({ model: "gemini-2.5-flash", safetySettings }),
+  pro25:       () => getGenAI().getGenerativeModel({ model: "gemini-2.5-pro", safetySettings }),
+  pro31:       () => getGenAI().getGenerativeModel({ model: "gemini-2.5-pro", safetySettings }),
+  embedding:   () => getGenAI().getGenerativeModel({ model: "text-embedding-004" }),
+  embeddingFb: () => getGenAI().getGenerativeModel({ model: "text-embedding-004" }),
 };
 
 export const FALLBACK_CHAINS = {
-  chat:        ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite"],
-  translation: ["gemini-2.5-flash-lite", "gemini-2.0-flash-lite"],
+  chat:        ["gemini-2.5-flash", "gemini-2.5-flash-lite"],
+  translation: ["gemini-2.5-flash-lite", "gemini-2.5-flash"],
   analysis:    ["gemini-2.5-pro", "gemini-2.5-flash"],
   draft:       ["gemini-2.5-pro", "gemini-2.5-flash"],
   embedding:   ["text-embedding-004"],
-  quick:       ["gemini-2.0-flash-lite", "gemini-2.0-flash"],
+  quick:       ["gemini-2.5-flash-lite", "gemini-2.5-flash"],
 } as const;
 
 export const HAMROH_SYSTEM_PROMPT = `You are Hamroh AI — a specialized legal assistant for Uzbek citizens abroad.
@@ -59,21 +78,25 @@ export async function withFallback<T>(
   label: string,
   attempts: Array<() => Promise<T>>
 ): Promise<T> {
+  let lastError: unknown;
+
   for (let i = 0; i < attempts.length; i++) {
     try {
       return await attempts[i]();
     } catch (err: unknown) {
+      lastError = err;
+      if (isGeminiConfigError(err)) throw err;
+
       const error = err as { status?: number; message?: string };
-      if (
-        (error?.status === 429 || error?.message?.includes("429")) &&
-        i < attempts.length - 1
-      ) {
-        console.warn(`[Gemini:${label}] 429 on attempt ${i + 1}, falling back`);
+      if (i < attempts.length - 1) {
+        console.warn(
+          `[Gemini:${label}] attempt ${i + 1} failed (${error?.status || "unknown"}), falling back`
+        );
         await new Promise((r) => setTimeout(r, 500 * (i + 1)));
         continue;
       }
       throw err;
     }
   }
-  throw new Error(`[Gemini:${label}] All fallbacks exhausted`);
+  throw lastError instanceof Error ? lastError : new Error(`[Gemini:${label}] All fallbacks exhausted`);
 }
