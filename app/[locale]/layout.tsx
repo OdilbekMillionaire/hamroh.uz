@@ -3,6 +3,7 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "@/lib/routing";
 import type { Locale } from "@/lib/routing";
+import EmergencyFAB from "@/components/shared/EmergencyFAB";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -26,6 +27,7 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       {children}
+      <EmergencyFAB />
     </NextIntlClientProvider>
   );
 }
