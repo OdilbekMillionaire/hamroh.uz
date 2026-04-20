@@ -4,6 +4,7 @@ import FirebaseAnalytics from "@/components/analytics/FirebaseAnalytics";
 import ToastContainer from "@/components/shared/Toast";
 import CookieConsent from "@/components/shared/CookieConsent";
 import BackToTop from "@/components/shared/BackToTop";
+import EmergencyFAB from "@/components/shared/EmergencyFAB";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastContainer />
         <CookieConsent />
         <BackToTop />
+        <EmergencyFAB />
       </body>
     </html>
   );

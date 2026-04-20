@@ -43,24 +43,28 @@ export default function Footer() {
   return (
     <footer className="bg-[#1A2733] text-white mt-auto">
       {/* Emergency bar */}
-      <div className="bg-[#E74C3C]/10 border-b border-white/10">
-        <div className="page-wrapper py-3 flex flex-wrap items-center gap-4 justify-between">
-          <div className="flex items-center gap-2 text-sm">
-            <Shield className="w-4 h-4 text-[#E74C3C] shrink-0" />
-            <span className="text-white/70 text-xs">Emergency legal help:</span>
-            <a href={`/${locale}/emergency`} className="text-[#2ECC71] font-semibold text-xs hover:underline">
+      <div className="bg-[#E74C3C] border-b-2 border-[#C0392B]">
+        <div className="page-wrapper py-3.5 flex flex-wrap items-center gap-4 justify-between">
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-3 w-3 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-white" />
+            </span>
+            <Shield className="w-4 h-4 text-white shrink-0" />
+            <span className="text-white/90 text-sm font-medium">Need urgent legal help?</span>
+            <a href={`/${locale}/emergency`} className="text-white font-bold text-sm underline underline-offset-2 hover:text-yellow-200 transition-colors">
               Open Emergency SOS →
             </a>
           </div>
-          <div className="flex items-center gap-4 text-xs text-white/50">
-            <span className="flex items-center gap-1">
-              <Phone className="w-3 h-3" />
-              Hotline: +998 71 200-10-01
-            </span>
-            <span className="flex items-center gap-1">
-              <Mail className="w-3 h-3" />
+          <div className="flex items-center gap-4 text-sm text-white/90 font-medium">
+            <a href="tel:+998712001001" className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <Phone className="w-3.5 h-3.5" />
+              +998 71 200-10-01
+            </a>
+            <a href="mailto:help@hamroh.uz" className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <Mail className="w-3.5 h-3.5" />
               help@hamroh.uz
-            </span>
+            </a>
           </div>
         </div>
       </div>

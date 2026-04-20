@@ -10,11 +10,16 @@ interface LogoProps {
 
 const sizes = {
   sm: { icon: 28, text: "text-base" },
-  md: { icon: 34, text: "text-xl" },
+  md: { icon: 34, text: "text-lg" },
   lg: { icon: 44, text: "text-2xl" },
   xl: { icon: 56, text: "text-3xl" },
 };
 
+/**
+ * HamrohUz logomark.
+ * Two pillars joined by a bridge + forward arrow = companionship + guidance.
+ * Green star = Uzbek flag / destination reached.
+ */
 export function LogoIcon({
   size = 34,
   variant = "color",
@@ -22,9 +27,11 @@ export function LogoIcon({
   size?: number;
   variant?: "color" | "white" | "mono";
 }) {
-  const primary = variant === "white" ? "#ffffff" : "#0E6E7E";
-  const accent = variant === "white" ? "rgba(255,255,255,0.7)" : "#2ECC71";
-  const bg = variant === "white" ? "rgba(255,255,255,0.15)" : "#E8F4F6";
+  const isDark = variant === "white";
+  const bg = isDark ? "rgba(255,255,255,0.15)" : "#0E6E7E";
+  const mark = "#ffffff";
+  const accent = isDark ? "rgba(255,255,255,0.9)" : "#2ECC71";
+  const gradId = `lg-${size}-${variant}`;
 
   return (
     <svg
@@ -33,54 +40,54 @@ export function LogoIcon({
       viewBox="0 0 40 40"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="HamrohUz logo"
+      aria-label="HamrohUz"
     >
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={isDark ? "rgba(255,255,255,0.18)" : "#10808F"} />
+          <stop offset="100%" stopColor={isDark ? "rgba(255,255,255,0.08)" : "#0A506A"} />
+        </linearGradient>
+      </defs>
+
       {/* Background rounded square */}
-      <rect width="40" height="40" rx="10" fill={variant === "white" ? "rgba(255,255,255,0.2)" : primary} />
+      <rect width="40" height="40" rx="11" fill={bg} />
+      <rect width="40" height="40" rx="11" fill={`url(#${gradId})`} />
 
-      {/* Shield body */}
-      <path
-        d="M20 7L10 11V20C10 25.5 14.5 30.5 20 32C25.5 30.5 30 25.5 30 20V11L20 7Z"
-        fill={variant === "white" ? "rgba(255,255,255,0.9)" : "#ffffff"}
-        opacity="0.15"
-      />
-      <path
-        d="M20 8.5L11 12V20C11 25 15 29.5 20 31C25 29.5 29 25 29 20V12L20 8.5Z"
-        stroke={variant === "white" ? "#ffffff" : "#ffffff"}
-        strokeWidth="1.5"
-        fill="none"
-        opacity="0.8"
-      />
+      {/* Left pillar */}
+      <rect x="8" y="11" width="5" height="19" rx="2.5" fill={mark} />
 
-      {/* H letter — bold, centered */}
-      <path
-        d="M15.5 14.5V25.5M24.5 14.5V25.5M15.5 20H24.5"
-        stroke={variant === "white" ? "#ffffff" : "#ffffff"}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {/* Right pillar */}
+      <rect x="27" y="11" width="5" height="19" rx="2.5" fill={mark} />
 
-      {/* Accent dot */}
-      <circle cx="32" cy="8" r="4" fill={accent} />
+      {/* Crossbar */}
+      <rect x="8" y="18.5" width="24" height="3" rx="1.5" fill={mark} opacity="0.8" />
+
+      {/* Destination star — top-center */}
+      <path
+        d="M20 5 L21.1 8.1 L24.4 8.1 L21.8 10.1 L22.7 13.2 L20 11.3 L17.3 13.2 L18.2 10.1 L15.6 8.1 L18.9 8.1 Z"
+        fill={accent}
+      />
     </svg>
   );
 }
 
 export default function Logo({ href, size = "md", variant = "full", className }: LogoProps) {
-  const s = sizes[size];
+  const { icon, text } = sizes[size];
   const isWhite = variant === "white";
 
-  const inner = (
-    <span className={cn("flex items-center gap-2.5 font-bold select-none", className)}>
-      <LogoIcon size={s.icon} variant={isWhite ? "white" : "color"} />
+  const content = (
+    <span className={cn("flex items-center gap-2.5 select-none", className)}>
+      <LogoIcon size={icon} variant={isWhite ? "white" : "color"} />
       {variant !== "icon" && (
         <span
-          className={cn(s.text, isWhite ? "text-white" : "text-[#0E6E7E]")}
-          style={{ fontFamily: "var(--font-jakarta, 'Plus Jakarta Sans', sans-serif)", letterSpacing: "-0.02em" }}
+          className={cn("font-extrabold leading-none tracking-tight", text)}
+          style={{
+            fontFamily: "var(--font-jakarta, 'Plus Jakarta Sans', sans-serif)",
+            color: isWhite ? "#ffffff" : "#0E6E7E",
+          }}
         >
-          Hamroh
-          <span className={isWhite ? "text-white/60" : "text-[#2ECC71]"}>Uz</span>
+          hamroh
+          <span style={{ color: isWhite ? "rgba(255,255,255,0.55)" : "#2ECC71" }}>.uz</span>
         </span>
       )}
     </span>
@@ -89,9 +96,9 @@ export default function Logo({ href, size = "md", variant = "full", className }:
   if (href) {
     return (
       <Link href={href} className="inline-flex items-center">
-        {inner}
+        {content}
       </Link>
     );
   }
-  return inner;
+  return <>{content}</>;
 }

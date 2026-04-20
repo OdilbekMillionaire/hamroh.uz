@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Phone, AlertTriangle, Shield, ExternalLink, MapPin, Clock } from "lucide-react";
+import { Phone, AlertTriangle, Shield, MapPin, Clock } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Emergency SOS — HamrohUz",
@@ -31,7 +32,8 @@ const LOCAL_EMERGENCY = [
   { type: "Fire", codes: { russia: "101", korea: "119", turkey: "110", uae: "997", germany: "112", usa: "911" } },
 ];
 
-export default function EmergencyPage() {
+export default async function EmergencyPage() {
+  const t = await getTranslations("emergency");
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -40,19 +42,16 @@ export default function EmergencyPage() {
         <section className="bg-[#E74C3C] py-8 text-white text-center">
           <AlertTriangle className="w-10 h-10 mx-auto mb-2 animate-pulse" />
           <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: "var(--font-jakarta)" }}>
-            Emergency SOS
+            {t("title")}
           </h1>
-          <p className="text-white/80 text-sm">
-            If you are in immediate physical danger, call local emergency services first (see below).
-            For legal emergencies, use the contacts on this page.
-          </p>
+          <p className="text-white/80 text-sm">{t("subtitle")}</p>
         </section>
 
         {/* Local emergency numbers */}
         <section className="py-8 bg-white border-b border-[#D8E2E9]">
           <div className="page-wrapper">
             <h2 className="text-lg font-bold text-[#1A2733] mb-4" style={{ fontFamily: "var(--font-jakarta)" }}>
-              Local Emergency Numbers
+              {t("localNumbers")}
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -91,7 +90,7 @@ export default function EmergencyPage() {
         <section className="py-12 bg-[#F7F9FA]">
           <div className="page-wrapper max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold text-[#1A2733] mb-8" style={{ fontFamily: "var(--font-jakarta)" }}>
-              What to Do in a Legal Emergency
+              {t("whatToDo")}
             </h2>
             <div className="space-y-4">
               {EMERGENCY_STEPS.map((step) => (
@@ -115,7 +114,7 @@ export default function EmergencyPage() {
             <div className="flex items-center gap-2 mb-8">
               <Shield className="w-5 h-5 text-[#0E6E7E]" />
               <h2 className="text-2xl font-bold text-[#1A2733]" style={{ fontFamily: "var(--font-jakarta)" }}>
-                Uzbek Embassy Contacts
+                {t("embassyContacts")}
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -135,11 +134,11 @@ export default function EmergencyPage() {
                     </a>
                     <a href={`tel:${emb.emergency}`} className="flex items-center gap-2 text-[#E74C3C] font-semibold hover:underline">
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                      Emergency: {emb.emergency}
+                      {t("emergencyLine")}: {emb.emergency}
                     </a>
                     <div className="flex items-center gap-2 text-[#8FA5B5]">
                       <Clock className="w-3.5 h-3.5 shrink-0" />
-                      Mon–Fri 09:00–17:00
+                      {t("hours")}
                     </div>
                   </div>
                 </div>
@@ -150,9 +149,7 @@ export default function EmergencyPage() {
 
         {/* Disclaimer */}
         <div className="page-wrapper py-6">
-          <p className="text-xs text-[#8FA5B5] text-center">
-            Embassy contacts are provided for informational purposes. Always verify current contact details on the official website of the Embassy of Uzbekistan in your country.
-          </p>
+          <p className="text-xs text-[#8FA5B5] text-center">{t("disclaimer")}</p>
         </div>
       </main>
       <Footer />
