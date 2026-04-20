@@ -1,4 +1,3 @@
-import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import Header from "@/components/layout/Header";
@@ -7,6 +6,8 @@ import LandingHero from "@/components/landing/LandingHero";
 import LandingFeatures from "@/components/landing/LandingFeatures";
 import LandingHowItWorks from "@/components/landing/LandingHowItWorks";
 import LandingStats from "@/components/landing/LandingStats";
+import LandingTestimonials from "@/components/landing/LandingTestimonials";
+import LandingLegalBasis from "@/components/landing/LandingLegalBasis";
 
 export default async function HomePage() {
   const locale = await getLocale();
@@ -19,6 +20,8 @@ export default async function HomePage() {
         <LandingStats />
         <LandingFeatures locale={locale} />
         <LandingHowItWorks />
+        <LandingTestimonials />
+        <LandingLegalBasis />
         <LandingCTA locale={locale} />
       </main>
       <Footer />

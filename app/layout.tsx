@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Nunito } from "next/font/google";
 import FirebaseAnalytics from "@/components/analytics/FirebaseAnalytics";
+import ToastContainer from "@/components/shared/Toast";
+import CookieConsent from "@/components/shared/CookieConsent";
+import BackToTop from "@/components/shared/BackToTop";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -83,6 +86,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-[#FFFFFF] antialiased">
         <FirebaseAnalytics />
         {children}
+        <ToastContainer />
+        <CookieConsent />
+        <BackToTop />
       </body>
     </html>
   );

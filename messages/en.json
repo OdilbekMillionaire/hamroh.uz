@@ -21,7 +21,12 @@
     "voice": "Voice Mode",
     "profile": "Profile",
     "news": "Live News",
-    "logout": "Logout"
+    "logout": "Logout",
+    "about": "About",
+    "faq": "FAQ",
+    "emergency": "Emergency SOS",
+    "contact": "Contact",
+    "rights": "Rights Checker"
   },
   "home": {
     "hero": {
@@ -222,5 +227,26 @@
     "fileTooLarge": "File too large. Max 10MB allowed.",
     "invalidFileType": "Only PDF, JPG, and PNG files are allowed.",
     "aiBusy": "AI is busy. Please try again shortly."
+  },
+  "rights": {
+    "title": "AI Rights Checker",
+    "subtitle": "Know your legal rights in any country",
+    "selectScenario": "What type of situation are you facing?",
+    "yourCountry": "Your current country",
+    "countryPlaceholder": "e.g. Russia, South Korea, Germany...",
+    "situationLabel": "Describe your situation",
+    "situationPlaceholder": "Describe what happened...",
+    "analyzeBtn": "Check My Rights with AI",
+    "analyzing": "Analyzing your rights...",
+    "yourRights": "Your Rights",
+    "recommendedSteps": "Recommended Steps",
+    "urgency": {
+      "low": "Low Urgency",
+      "medium": "Medium Urgency",
+      "high": "High Urgency — Act Soon"
+    },
+    "disclaimer": "AI-generated for informational purposes only.",
+    "chatCta": "Chat with Hamroh AI",
+    "petitionCta": "File a Petition"
   }
 }

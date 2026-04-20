@@ -21,7 +21,12 @@
     "voice": "Ovozli rejim",
     "profile": "Profil",
     "news": "Jonli Yangiliklar",
-    "logout": "Chiqish"
+    "logout": "Chiqish",
+    "about": "Biz haqimizda",
+    "faq": "FAQ",
+    "emergency": "Favqulodda holat",
+    "contact": "Aloqa",
+    "rights": "Huquqlar tekshiruvi"
   },
   "home": {
     "hero": {
@@ -222,5 +227,26 @@
     "fileTooLarge": "Fayl hajmi juda katta. Maksimum 10MB.",
     "invalidFileType": "Faqat PDF, JPG va PNG fayllar ruxsat etiladi.",
     "aiBusy": "AI band. Biroz kutib qayta urinib ko'ring."
+  },
+  "rights": {
+    "title": "AI Huquqlar tekshiruvi",
+    "subtitle": "Istalgan mamlakatdagi huquqlaringizni biling",
+    "selectScenario": "Qanday vaziyat yuz berdi?",
+    "yourCountry": "Hozirgi mamlakatiz",
+    "countryPlaceholder": "masalan, Rossiya, Koreya, Germaniya...",
+    "situationLabel": "Vaziyatingizni tushuntiring",
+    "situationPlaceholder": "Nima bo'lganini tavsiflang...",
+    "analyzeBtn": "AI bilan huquqlarimni tekshirish",
+    "analyzing": "Huquqlaringiz tahlil qilinmoqda...",
+    "yourRights": "Sizning huquqlaringiz",
+    "recommendedSteps": "Tavsiya etilgan qadamlar",
+    "urgency": {
+      "low": "Past tezlik",
+      "medium": "O'rta tezlik",
+      "high": "Yuqori tezlik"
+    },
+    "disclaimer": "Faqat ma'lumot uchun AI tomonidan yaratilgan.",
+    "chatCta": "Hamroh AI bilan suhbatlashing",
+    "petitionCta": "Ariza topshirish"
   }
 }
