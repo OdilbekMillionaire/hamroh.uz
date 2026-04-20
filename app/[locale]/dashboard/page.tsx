@@ -1,21 +1,14 @@
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
 import {
-  FileText, Bot, BookOpen, Globe, TrendingUp, Clock,
-  Lightbulb, ArrowRight, Scale, MapPin, ChevronRight, Newspaper
+  FileText, Bot, Globe, TrendingUp, Clock,
+  Lightbulb, ArrowRight, Scale, MapPin, ChevronRight, Newspaper, BookOpen
 } from "lucide-react";
 import Link from "next/link";
 
-// Mock data — replace with Firestore queries post-Firebase setup
 const MOCK_USER = { name: "Dilshod", country: "South Korea", countryFlag: "🇰🇷" };
-
-const MOCK_STATS = [
-  { label: "Active Petitions", value: "3", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", href: "/petitions?status=active" },
-  { label: "Resolved", value: "12", icon: TrendingUp, color: "text-[#2ECC71]", bg: "bg-green-50", href: "/petitions?status=resolved" },
-  { label: "Pending Review", value: "1", icon: Clock, color: "text-[#F39C12]", bg: "bg-orange-50", href: "/petitions?status=reviewing" },
-];
 
 const MOCK_CONTENT = [
   { title: "Labor Rights in Russia: What You Need to Know", type: "article", country: "RU", href: "#" },
@@ -23,15 +16,22 @@ const MOCK_CONTENT = [
   { title: "Emergency Contacts for Uzbek Citizens in South Korea", type: "news", country: "KR", href: "#" },
 ];
 
-const QUICK_ACTIONS = (locale: string) => [
-  { icon: Bot, label: "Ask Hamroh AI", href: `/${locale}/ai-assistant`, primary: true },
-  { icon: FileText, label: "New Petition", href: `/${locale}/petitions/new`, primary: false },
-  { icon: Scale, label: "Check My Rights", href: `/${locale}/rights`, primary: false },
-  { icon: Globe, label: "Safety Map", href: `/${locale}/maps/security`, primary: false },
-];
-
 export default async function DashboardPage() {
   const locale = await getLocale();
+  const t = await getTranslations("dashboard");
+
+  const MOCK_STATS = [
+    { label: t("activePetitions"), value: "3", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", href: "/petitions?status=active" },
+    { label: t("resolved"), value: "12", icon: TrendingUp, color: "text-[#2ECC71]", bg: "bg-green-50", href: "/petitions?status=resolved" },
+    { label: t("pendingReview"), value: "1", icon: Clock, color: "text-[#F39C12]", bg: "bg-orange-50", href: "/petitions?status=reviewing" },
+  ];
+
+  const QUICK_ACTIONS = [
+    { icon: Bot, label: t("askAI"), href: `/${locale}/ai-assistant`, primary: true },
+    { icon: FileText, label: t("newPetition"), href: `/${locale}/petitions/new`, primary: false },
+    { icon: Scale, label: t("checkMyRights"), href: `/${locale}/rights`, primary: false },
+    { icon: Globe, label: t("safetyMap"), href: `/${locale}/maps/security`, primary: false },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -45,23 +45,23 @@ export default async function DashboardPage() {
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: "var(--font-jakarta)" }}>
-                  Welcome back, {MOCK_USER.name}! 👋
+                  {t("greeting")}, {MOCK_USER.name}! 👋
                 </h1>
                 <p className="text-[var(--text-secondary)] text-sm flex items-center gap-1.5 mt-1">
                   <MapPin className="w-3.5 h-3.5" />
                   {MOCK_USER.countryFlag} {MOCK_USER.country}
-                  <button className="ml-1 text-[#0E6E7E] hover:underline text-xs">Change</button>
+                  <button className="ml-1 text-[#0E6E7E] hover:underline text-xs">{t("change")}</button>
                 </p>
               </div>
               <Link
                 href={`/${locale}/petitions/new`}
                 className="inline-flex items-center gap-2 bg-[#0E6E7E] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-[#0B5A6A] transition-colors shrink-0"
               >
-                <FileText className="w-4 h-4" /> New Petition
+                <FileText className="w-4 h-4" /> {t("newPetition")}
               </Link>
             </div>
 
-            {/* Stat cards — clickable */}
+            {/* Stat cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               {MOCK_STATS.map((stat) => (
                 <Link
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
                   <div className="flex items-center gap-2 mb-4">
                     <Lightbulb className="w-5 h-5 text-[#2ECC71]" />
                     <h2 className="font-bold text-[var(--text-primary)]" style={{ fontFamily: "var(--font-jakarta)" }}>
-                      Today&apos;s Legal Tip
+                      {t("todaysTip")}
                     </h2>
                     <span className="ml-auto text-xs text-[var(--text-muted)] bg-[var(--bg-muted)] px-2 py-0.5 rounded-full">
                       {MOCK_USER.country}
@@ -103,14 +103,14 @@ export default async function DashboardPage() {
                       Your employer must provide written notice at least 30 days before termination, or pay 30 days&apos; wages in lieu.
                     </p>
                     <div className="mt-2 text-xs text-[#0E6E7E]/60">
-                      Powered by Hamroh AI • Updated daily
+                      {t("poweredBy")} • {t("updatedDaily")}
                     </div>
                   </div>
                   <Link
                     href={`/${locale}/rights`}
                     className="mt-3 flex items-center gap-1.5 text-sm text-[#0E6E7E] hover:underline font-medium"
                   >
-                    <Scale className="w-4 h-4" /> Check all your rights
+                    <Scale className="w-4 h-4" /> {t("checkRights")}
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -119,10 +119,10 @@ export default async function DashboardPage() {
                 <div className="card">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="font-bold text-[var(--text-primary)]" style={{ fontFamily: "var(--font-jakarta)" }}>
-                      Recent Legal Content
+                      {t("recentContent")}
                     </h2>
                     <Link href={`/${locale}/content`} className="text-sm text-[#0E6E7E] hover:underline flex items-center gap-1">
-                      View all <ArrowRight className="w-3.5 h-3.5" />
+                      {t("viewAll")} <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                   <div className="space-y-2">
@@ -158,11 +158,11 @@ export default async function DashboardPage() {
                     <div className="flex items-center gap-2">
                       <Newspaper className="w-5 h-5 text-[#0E6E7E]" />
                       <h2 className="font-bold text-[var(--text-primary)]" style={{ fontFamily: "var(--font-jakarta)" }}>
-                        Latest News
+                        {t("latestNews")}
                       </h2>
                     </div>
                     <Link href={`/${locale}/news`} className="text-sm text-[#0E6E7E] hover:underline flex items-center gap-1">
-                      All news <ArrowRight className="w-3.5 h-3.5" />
+                      {t("allNews")} <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                   <div className="space-y-2">
@@ -187,10 +187,10 @@ export default async function DashboardPage() {
               <div className="space-y-4">
                 <div className="card">
                   <h2 className="font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: "var(--font-jakarta)" }}>
-                    Quick Actions
+                    {t("quickActions")}
                   </h2>
                   <div className="space-y-2">
-                    {QUICK_ACTIONS(locale).map((action) => (
+                    {QUICK_ACTIONS.map((action) => (
                       <Link
                         key={action.label}
                         href={action.href}
@@ -220,7 +220,7 @@ export default async function DashboardPage() {
                   </div>
                   <div className="inline-flex items-center gap-1.5 bg-[#2ECC71]/20 text-[#2ECC71] text-xs font-semibold px-2.5 py-1 rounded-full mb-2">
                     <span className="w-1.5 h-1.5 bg-[#2ECC71] rounded-full" />
-                    Generally Safe
+                    {t("generallySafe")}
                   </div>
                   <p className="text-xs text-white/70 leading-relaxed">
                     Seoul and major cities have active Uzbek communities. Labor law is generally enforced. Carry E-9 permit copy.
@@ -230,7 +230,7 @@ export default async function DashboardPage() {
                 {/* Emergency contacts widget */}
                 <div className="card border-[#E74C3C]/20">
                   <h3 className="font-bold text-[var(--text-primary)] mb-3 text-sm" style={{ fontFamily: "var(--font-jakarta)" }}>
-                    Emergency Contacts
+                    {t("emergencyContacts")}
                   </h3>
                   <div className="space-y-2 text-xs">
                     <a href="tel:112" className="flex items-center justify-between p-2 bg-red-50 rounded-xl hover:bg-red-100 transition-colors">
@@ -242,7 +242,7 @@ export default async function DashboardPage() {
                       <span className="font-medium text-[#0E6E7E]">+82 2 574-6554</span>
                     </a>
                     <Link href={`/${locale}/emergency`} className="flex items-center justify-center gap-1.5 text-[#0E6E7E] hover:underline mt-1 font-medium">
-                      All emergency contacts <ArrowRight className="w-3.5 h-3.5" />
+                      {t("allEmergency")} <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
                 </div>
