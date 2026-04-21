@@ -1,19 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { RecaptchaVerifier, signInWithPhoneNumber, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import type { ConfirmationResult } from "firebase/auth";
+import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from "lucide-react";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import LanguageSwitcher from "@/components/shared/LanguageSwitcher";
 import { auth, db } from "@/lib/firebase";
-
-function normalizePhoneNumber(value: string) {
-  const phone = value.trim().replace(/[^\d+]/g, "");
-  return phone.startsWith("+") ? phone : `+${phone}`;
-}
 
 function getAuthErrorMessage(error: unknown) {
   const code =
@@ -21,42 +15,42 @@ function getAuthErrorMessage(error: unknown) {
       ? String((error as { code?: unknown }).code)
       : "";
 
-  if (code === "auth/invalid-phone-number") return "Invalid phone number. Use international format, e.g. +998 90 123 45 67";
-  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a few minutes and try again.";
-  if (code === "auth/code-expired") return "This code has expired. Please request a new one.";
-  if (code === "auth/invalid-verification-code") return "Incorrect verification code. Please check and try again.";
-  if (code === "auth/quota-exceeded") return "SMS limit reached. Please try again in a few minutes.";
-  if (code === "auth/network-request-failed") return "Network error. Please check your connection and try again.";
-  if (code === "auth/captcha-check-failed") return "Verification failed. Please refresh the page and try again.";
+  if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found")
+    return "Incorrect email or password. Please try again.";
+  if (code === "auth/too-many-requests")
+    return "Too many failed attempts. Please wait a few minutes and try again.";
+  if (code === "auth/user-disabled")
+    return "This account has been disabled. Please contact support.";
+  if (code === "auth/network-request-failed")
+    return "Network error. Please check your connection and try again.";
+  if (code === "auth/popup-closed-by-user")
+    return "Google sign-in was cancelled. Please try again.";
 
-  return "Could not send SMS. Make sure your number includes the country code (e.g. +998 for Uzbekistan).";
+  return "Sign-in failed. Please check your credentials and try again.";
 }
 
 export default function LoginPage() {
   const t = useTranslations();
   const locale = useLocale();
-  const [step, setStep] = useState<"input" | "otp">("input");
-  const [value, setValue] = useState("");
-  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-  const recaptchaVerifier = useRef<RecaptchaVerifier | null>(null);
 
-  function getRecaptchaVerifier() {
-    if (!recaptchaVerifier.current) {
-      recaptchaVerifier.current = new RecaptchaVerifier(auth, "login-recaptcha-container", {
-        size: "normal",
-      });
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      window.location.href = `/${locale}/dashboard`;
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
-
-    return recaptchaVerifier.current;
-  }
-
-  function resetRecaptcha() {
-    recaptchaVerifier.current?.clear();
-    recaptchaVerifier.current = null;
   }
 
   async function handleGoogleLogin() {
@@ -79,49 +73,6 @@ export default function LoginPage() {
       setError(getAuthErrorMessage(err));
     } finally {
       setGoogleLoading(false);
-    }
-  }
-
-  async function handleSend() {
-    setError("");
-    setLoading(true);
-    try {
-      auth.languageCode = locale === "uz-cyrl" ? "uz" : locale;
-      const result = await signInWithPhoneNumber(auth, normalizePhoneNumber(value), getRecaptchaVerifier());
-      setConfirmationResult(result);
-      setStep("otp");
-    } catch (err) {
-      resetRecaptcha();
-      setError(getAuthErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleVerify() {
-    if (!confirmationResult) {
-      setError("Please request a verification code first.");
-      setStep("input");
-      return;
-    }
-
-    setError("");
-    setLoading(true);
-    try {
-      const credential = await confirmationResult.confirm(otp);
-      await setDoc(
-        doc(db, "users", credential.user.uid),
-        {
-          phoneNumber: credential.user.phoneNumber,
-          lastLoginAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-      window.location.href = `/${locale}/dashboard`;
-    } catch (err) {
-      setError(getAuthErrorMessage(err));
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -150,64 +101,58 @@ export default function LoginPage() {
             </div>
           )}
 
-          {step === "input" ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-                  {t("auth.phone")}
-                </label>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
                 <input
-                  type="tel"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder="+998 90 123 45 67"
-                  className="w-full px-4 py-3 border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  className="w-full pl-10 pr-4 py-3 border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
                 />
               </div>
-              <button
-                onClick={handleSend}
-                disabled={!value || loading}
-                className="w-full flex items-center justify-center gap-2 btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
-                {t("auth.sendOtp")}
-              </button>
-              <div id="login-recaptcha-container" className="min-h-[78px]" />
             </div>
-          ) : (
-            <div className="space-y-4">
-              <p className="text-sm text-[var(--text-secondary)] text-center">
-                {t("auth.codeSentTo")} <strong>{value}</strong>
-              </p>
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.slice(0, 6))}
-                placeholder={t("auth.otpPlaceholder")}
-                className="w-full px-4 py-3 border border-[var(--border)] rounded-xl text-sm text-center tracking-widest text-xl focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all"
-              />
-              <button
-                onClick={handleVerify}
-                disabled={otp.length !== 6 || loading}
-                className="w-full flex items-center justify-center gap-2 btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                {t("auth.verifyOtp")}
-              </button>
-              <button
-                onClick={() => {
-                  resetRecaptcha();
-                  setConfirmationResult(null);
-                  setStep("input");
-                }}
-                className="w-full text-sm text-[var(--text-muted)] hover:text-[var(--primary)]"
-              >
-                {t("common.back")}
-              </button>
-            </div>
-          )}
 
-          {/* Divider */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Your password"
+                  required
+                  className="w-full pl-10 pr-10 py-3 border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={!email || !password || loading}
+              className="w-full flex items-center justify-center gap-2 btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+              {t("auth.login")}
+            </button>
+          </form>
+
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-[var(--border)]" />
@@ -217,7 +162,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Google */}
           <button
             onClick={() => void handleGoogleLogin()}
             disabled={googleLoading || loading}
