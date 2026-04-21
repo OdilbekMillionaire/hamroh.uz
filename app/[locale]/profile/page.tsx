@@ -1,20 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { signOut, updateProfile } from "firebase/auth";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import Footer from "@/components/layout/Footer";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { auth } from "@/lib/firebase";
+import { auth, db, storage } from "@/lib/firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import {
   Bell, FileText, Bookmark, Edit, Save, LogOut,
   Loader2, CheckCircle, Shield, Settings, ChevronRight,
-  Phone, Mail, MapPin, Camera
+  Mail, MapPin, Camera, Smile, X
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 const COUNTRIES = [
@@ -26,6 +29,8 @@ const COUNTRIES = [
   { name: "Other", flag: "🌍" },
 ];
 
+const AVATAR_EMOJIS = ["😊", "🧑‍💼", "👨‍⚖️", "👩‍⚖️", "🧑‍🎓", "👷", "🧕", "👨‍💻", "🦸", "🧑‍🌾"];
+
 export default function ProfilePage() {
   const locale = useLocale();
   const t = useTranslations("profile");
@@ -36,7 +41,10 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [form, setForm] = useState({ displayName: "", country: "", countryFlag: "", email: "" });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function startEdit() {
     setForm({
@@ -62,6 +70,30 @@ export default function ProfilePage() {
     finally { setSaving(false); }
   }
 
+  async function handlePhotoUpload(file: File) {
+    if (!user) return;
+    setPhotoUploading(true);
+    try {
+      const fileRef = storageRef(storage, `profile-photos/${user.uid}/${Date.now()}-${file.name}`);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+      await updateProfile(user, { photoURL: url });
+      await updateDoc(doc(db, "users", user.uid), { photoURL: url });
+      // Force re-render by reloading
+      window.location.reload();
+    } catch {
+      /* silent */
+    } finally {
+      setPhotoUploading(false);
+    }
+  }
+
+  async function handleEmojiAvatar(emoji: string) {
+    if (!user) return;
+    setShowEmojiPicker(false);
+    await save({ avatarEmoji: emoji });
+  }
+
   async function handleLogout() {
     await signOut(auth);
     router.push(`/${locale}/login`);
@@ -74,10 +106,11 @@ export default function ProfilePage() {
 
   const loading = authLoading || profileLoading;
   const displayName = profile?.displayName || user?.displayName || "—";
-  const phone = profile?.phone || user?.phoneNumber || "—";
   const email = profile?.email || user?.email || "—";
   const country = profile?.country || "—";
   const countryFlag = profile?.countryFlag || "🌍";
+  const photoURL = user?.photoURL || null;
+  const avatarEmoji = (profile as { avatarEmoji?: string } | null)?.avatarEmoji;
   const initials = displayName !== "—" ? displayName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase() : "?";
 
   if (loading) return (
@@ -135,12 +168,66 @@ export default function ProfilePage() {
 
             {/* Avatar card */}
             <div className="card mb-5">
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-5">
+                {/* Avatar with upload + emoji */}
                 <div className="relative shrink-0">
-                  <div className="w-16 h-16 rounded-2xl bg-[#0E6E7E] flex items-center justify-center text-white text-2xl font-bold">{initials}</div>
-                  <button className="absolute -bottom-1 -right-1 w-6 h-6 bg-white border-2 border-[var(--border)] rounded-full flex items-center justify-center hover:border-[#0E6E7E] transition-colors">
-                    <Camera className="w-3 h-3 text-[var(--text-muted)]" />
+                  <div className="w-20 h-20 rounded-2xl bg-[#0E6E7E] flex items-center justify-center text-white overflow-hidden">
+                    {photoURL ? (
+                      <Image src={photoURL} alt="Profile photo" width={80} height={80} className="object-cover w-full h-full" />
+                    ) : avatarEmoji ? (
+                      <span className="text-4xl">{avatarEmoji}</span>
+                    ) : (
+                      <span className="text-3xl font-bold">{initials}</span>
+                    )}
+                  </div>
+
+                  {/* Photo upload button */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) void handlePhotoUpload(f); }}
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={photoUploading}
+                    title="Upload photo"
+                    className="absolute -bottom-1 -right-1 w-7 h-7 bg-white border-2 border-[#0E6E7E] rounded-full flex items-center justify-center hover:bg-[#E8F4F6] transition-colors shadow-sm"
+                  >
+                    {photoUploading ? <Loader2 className="w-3.5 h-3.5 text-[#0E6E7E] animate-spin" /> : <Camera className="w-3.5 h-3.5 text-[#0E6E7E]" />}
                   </button>
+
+                  {/* Emoji/Avatar button */}
+                  <button
+                    onClick={() => setShowEmojiPicker((v) => !v)}
+                    title="Choose avatar emoji"
+                    className="absolute -top-1 -right-1 w-7 h-7 bg-white border-2 border-[#D8E2E9] rounded-full flex items-center justify-center hover:border-[#0E6E7E] transition-colors shadow-sm"
+                  >
+                    <Smile className="w-3.5 h-3.5 text-[#4A6274]" />
+                  </button>
+
+                  {/* Emoji picker popover */}
+                  {showEmojiPicker && (
+                    <div className="absolute top-9 left-full ml-2 bg-white border border-[#D8E2E9] rounded-2xl shadow-xl p-3 z-20 w-52">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-semibold text-[#4A6274]">Choose avatar</p>
+                        <button onClick={() => setShowEmojiPicker(false)}><X className="w-3.5 h-3.5 text-[#8FA5B5]" /></button>
+                      </div>
+                      <div className="grid grid-cols-5 gap-1">
+                        {AVATAR_EMOJIS.map((emoji) => (
+                          <button
+                            key={emoji}
+                            onClick={() => void handleEmojiAvatar(emoji)}
+                            className="text-2xl p-1.5 rounded-xl hover:bg-[#E8F4F6] transition-colors text-center"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-[#8FA5B5] mt-2 text-center">Or upload a photo →</p>
+                    </div>
+                  )}
                 </div>
 
                 {editing ? (
@@ -161,12 +248,15 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="flex-1">
-                    <h2 className="font-bold text-[var(--text-primary)] text-lg">{displayName}</h2>
+                    <h2 className="font-bold text-[var(--text-primary)] text-xl">{displayName}</h2>
                     <div className="space-y-1.5 mt-2">
-                      {phone !== "—" && <p className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]"><Phone className="w-3.5 h-3.5" /> {phone}</p>}
                       {email !== "—" && <p className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]"><Mail className="w-3.5 h-3.5" /> {email}</p>}
                       <p className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]"><MapPin className="w-3.5 h-3.5" /> {countryFlag} {country}</p>
                     </div>
+                    <p className="text-xs text-[#8FA5B5] mt-3">
+                      Tap <Camera className="inline w-3 h-3" /> to upload a photo &nbsp;·&nbsp;
+                      Tap <Smile className="inline w-3 h-3" /> for emoji avatar
+                    </p>
                   </div>
                 )}
               </div>

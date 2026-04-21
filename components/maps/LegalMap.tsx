@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Search, MapPin, Phone, Star, Building, Shield, Briefcase, Cross } from "lucide-react";
+import { Search, Phone, Star, Building, Shield, Briefcase, Cross, MapPin, Clock, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
 
 const FILTERS = ["all", "police", "hospital", "lawyer", "embassy"] as const;
 
@@ -24,6 +25,8 @@ const mockPlaces = [
     phone: "+7 495 143-31-15",
     rating: 4.2,
     hours: "Mon-Fri 9:00-17:00",
+    lat: 55.7297,
+    lng: 37.5700,
   },
   {
     id: "2",
@@ -33,6 +36,8 @@ const mockPlaces = [
     phone: "+7 800 100-00-01",
     rating: 4.7,
     hours: "Mon-Sat 10:00-19:00",
+    lat: 55.7627,
+    lng: 37.6062,
   },
   {
     id: "3",
@@ -42,8 +47,56 @@ const mockPlaces = [
     phone: "+7 499 190-52-52",
     rating: 4.0,
     hours: "24/7",
+    lat: 55.7968,
+    lng: 37.4498,
+  },
+  {
+    id: "4",
+    name: "Embassy of Uzbekistan in Seoul",
+    type: "embassy",
+    address: "Dong빙-dong, Yongsan-gu, Seoul",
+    phone: "+82 2 574-6554",
+    rating: 4.5,
+    hours: "Mon-Fri 9:00-18:00",
+    lat: 37.5400,
+    lng: 126.9950,
+  },
+  {
+    id: "5",
+    name: "Korean Labor Rights Office",
+    type: "lawyer",
+    address: "Jung-gu, Seoul",
+    phone: "+82 2 6902-5600",
+    rating: 4.6,
+    hours: "Mon-Fri 9:00-18:00",
+    lat: 37.5636,
+    lng: 126.9976,
+  },
+  {
+    id: "6",
+    name: "Embassy of Uzbekistan in Istanbul",
+    type: "embassy",
+    address: "Levent, Beşiktaş, Istanbul",
+    phone: "+90 212 270-09-26",
+    rating: 4.3,
+    hours: "Mon-Fri 9:00-17:00",
+    lat: 41.0794,
+    lng: 29.0136,
   },
 ];
+
+// Dynamically import Leaflet map to avoid SSR issues
+const MapView = dynamic(() => import("./LeafletMapView"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex-1 bg-[#e8f4f6] flex items-center justify-center">
+      <div className="text-center text-[var(--text-muted)]">
+        <MapPin className="w-10 h-10 mx-auto mb-2 text-[var(--primary)] animate-pulse" />
+        <p className="text-sm font-medium">Loading map...</p>
+      </div>
+    </div>
+  ),
+});
 
 export default function LegalMap() {
   const t = useTranslations("maps.legal");
@@ -61,6 +114,7 @@ export default function LegalMap() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)]">
+      {/* Sidebar list */}
       <div className="w-80 shrink-0 border-r border-[var(--border)] flex flex-col bg-white">
         <div className="p-4 border-b border-[var(--border)]">
           <h1 className="font-bold text-[var(--text-primary)] mb-3" style={{ fontFamily: "var(--font-jakarta)" }}>
@@ -84,7 +138,9 @@ export default function LegalMap() {
                   onClick={() => setFilter(f)}
                   className={cn(
                     "flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all",
-                    filter === f ? "bg-[var(--primary)] text-white" : "bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
+                    filter === f
+                      ? "bg-[var(--primary)] text-white"
+                      : "bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
                   )}
                 >
                   <Icon className="w-3 h-3" />
@@ -104,7 +160,7 @@ export default function LegalMap() {
                 onClick={() => setSelected(place.id === selected ? null : place.id)}
                 className={cn(
                   "w-full p-4 text-left hover:bg-[var(--bg-subtle)] transition-colors",
-                  selected === place.id && "bg-[var(--primary-light)]"
+                  selected === place.id && "bg-[var(--primary-light)] border-l-2 border-[var(--primary)]"
                 )}
               >
                 <div className="flex items-start gap-3">
@@ -116,43 +172,65 @@ export default function LegalMap() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[var(--text-primary)] leading-tight">{place.name}</p>
                     <p className="text-xs text-[var(--text-muted)] mt-0.5 truncate">{place.address}</p>
-                    <div className="flex items-center gap-1 mt-1">
-                      <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />
-                      <span className="text-xs text-[var(--text-muted)]">{place.rating}</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="flex items-center gap-0.5 text-xs text-[var(--text-muted)]">
+                        <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />
+                        {place.rating}
+                      </span>
+                      <span className="flex items-center gap-0.5 text-xs text-[var(--text-muted)]">
+                        <Clock className="w-3 h-3" />
+                        {place.hours}
+                      </span>
                     </div>
                   </div>
                 </div>
               </button>
             );
           })}
+          {filtered.length === 0 && (
+            <div className="p-8 text-center text-[var(--text-muted)] text-sm">No results found.</div>
+          )}
         </div>
       </div>
 
-      <div className="flex-1 relative bg-[var(--bg-muted)]">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-[var(--text-muted)]">
-            <MapPin className="w-12 h-12 mx-auto mb-3 text-[var(--primary)]" />
-            <p className="font-medium text-[var(--text-secondary)]">Interactive Map</p>
-            <p className="text-sm mt-1">Google Maps API key required</p>
-            <p className="text-xs mt-1 text-[var(--text-muted)]">Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in .env.local</p>
-          </div>
-        </div>
+      {/* Map area */}
+      <div className="flex-1 relative">
+        <MapView
+          places={filtered}
+          selected={selected}
+          onSelect={setSelected}
+        />
 
+        {/* Selected place card */}
         {selectedPlace && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-lg p-5 w-80 border border-[var(--border)]">
-            <h3 className="font-bold text-[var(--text-primary)] mb-1 text-sm">{selectedPlace.name}</h3>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-xl p-5 w-80 border border-[var(--border)] z-[1000]">
+            <div className="flex items-start justify-between mb-1">
+              <h3 className="font-bold text-[var(--text-primary)] text-sm leading-tight pr-2">{selectedPlace.name}</h3>
+              <button
+                onClick={() => setSelected(null)}
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] shrink-0 text-lg leading-none"
+              >×</button>
+            </div>
             <p className="text-xs text-[var(--text-muted)] mb-3">{selectedPlace.address}</p>
-            <div className="space-y-2 text-xs">
+            <div className="space-y-1.5 text-xs mb-4">
               <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                <Phone className="w-3.5 h-3.5" />
-                {selectedPlace.phone}
+                <Phone className="w-3.5 h-3.5 shrink-0" />{selectedPlace.phone}
               </div>
               <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                <Star className="w-3.5 h-3.5 text-yellow-400" fill="currentColor" />
-                {selectedPlace.rating} / 5.0
+                <Clock className="w-3.5 h-3.5 shrink-0" />{selectedPlace.hours}
+              </div>
+              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <Star className="w-3.5 h-3.5 text-yellow-400 shrink-0" fill="currentColor" />{selectedPlace.rating} / 5.0
               </div>
             </div>
-            <button className="mt-3 w-full btn-primary text-xs py-2">Get Directions</button>
+            <a
+              href={`https://www.google.com/maps/search/${encodeURIComponent(selectedPlace.name + " " + selectedPlace.address)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full btn-primary text-xs py-2 flex items-center justify-center gap-1.5"
+            >
+              <ExternalLink className="w-3 h-3" /> Get Directions
+            </a>
           </div>
         )}
       </div>

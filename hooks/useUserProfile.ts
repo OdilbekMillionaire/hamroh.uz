@@ -11,6 +11,8 @@ export interface UserProfile {
   email: string;
   country: string;
   countryFlag: string;
+  avatarEmoji?: string;
+  photoURL?: string;
   preferredLocale: string;
   activePetitions: number;
   resolvedPetitions: number;

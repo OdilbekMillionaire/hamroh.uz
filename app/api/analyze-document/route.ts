@@ -30,6 +30,14 @@ Respond in ${locale === "ru" ? "Russian" : locale === "uz-cyrl" ? "Uzbek Cyrilli
         ]);
         return res.response.text();
       },
+      async () => {
+        const model = models.flash25();
+        const res = await model.generateContent([
+          { inlineData: { data: base64, mimeType } },
+          { text: prompt },
+        ]);
+        return res.response.text();
+      },
     ]);
 
     return Response.json({ analysis: result });
