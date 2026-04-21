@@ -99,9 +99,12 @@ export default function ProfilePage() {
     router.push(`/${locale}/login`);
   }
 
-  async function toggleNotification(key: keyof NonNullable<typeof profile>["notifications"]) {
+  const DEFAULT_NOTIFS = { petitionUpdates: true, legalNews: true, aiTips: false, emergencyAlerts: true };
+
+  async function toggleNotification(key: keyof typeof DEFAULT_NOTIFS) {
     if (!profile) return;
-    await save({ notifications: { ...profile.notifications, [key]: !profile.notifications[key] } });
+    const current = profile.notifications ?? DEFAULT_NOTIFS;
+    await save({ notifications: { ...DEFAULT_NOTIFS, ...current, [key]: !current[key] } });
   }
 
   const loading = authLoading || profileLoading;
@@ -285,14 +288,18 @@ export default function ProfilePage() {
                 { key: "legalNews" as const, label: `Legal news (${country === "—" ? "your country" : country})` },
                 { key: "aiTips" as const, label: "Daily AI legal tips" },
                 { key: "emergencyAlerts" as const, label: "Emergency safety alerts" },
-              ] as const).map((item) => (
-                <div key={item.key} className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0">
-                  <div className="flex items-center gap-2"><Bell className="w-4 h-4 text-[var(--text-muted)]" /><span className="text-sm text-[var(--text-secondary)]">{item.label}</span></div>
-                  <button onClick={() => void toggleNotification(item.key)} className={`relative w-11 h-6 rounded-full transition-colors ${profile?.notifications[item.key] ? "bg-[#0E6E7E]" : "bg-[var(--bg-muted)]"}`}>
-                    <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${profile?.notifications[item.key] ? "translate-x-5" : "translate-x-0.5"}`} />
-                  </button>
-                </div>
-              ))}
+              ] as const).map((item) => {
+                const notifs = profile?.notifications ?? DEFAULT_NOTIFS;
+                const enabled = notifs[item.key] ?? DEFAULT_NOTIFS[item.key];
+                return (
+                  <div key={item.key} className="flex items-center justify-between py-3 border-b border-[var(--border)] last:border-0">
+                    <div className="flex items-center gap-2"><Bell className="w-4 h-4 text-[var(--text-muted)]" /><span className="text-sm text-[var(--text-secondary)]">{item.label}</span></div>
+                    <button onClick={() => void toggleNotification(item.key)} className={`relative w-11 h-6 rounded-full transition-colors ${enabled ? "bg-[#0E6E7E]" : "bg-[var(--bg-muted)]"}`}>
+                      <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${enabled ? "translate-x-5" : "translate-x-0.5"}`} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Account actions */}

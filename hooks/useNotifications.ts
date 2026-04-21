@@ -35,23 +35,31 @@ export function useNotifications(userId: string | null) {
       limit(20)
     );
 
-    const unsub = onSnapshot(q, (snap) => {
-      const items: Notification[] = snap.docs.map((d) => {
-        const data = d.data();
-        const ts = data.createdAt as Timestamp | null;
-        return {
-          id: d.id,
-          title: data.title as string,
-          body: data.body as string,
-          type: data.type as Notification["type"],
-          read: data.read as boolean,
-          createdAt: ts ? ts.toDate() : new Date(),
-          href: data.href as string | undefined,
-        };
-      });
-      setNotifications(items);
-      setLoading(false);
-    });
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const items: Notification[] = snap.docs.map((d) => {
+          const data = d.data();
+          const ts = data.createdAt as Timestamp | null;
+          return {
+            id: d.id,
+            title: data.title as string,
+            body: data.body as string,
+            type: data.type as Notification["type"],
+            read: data.read as boolean,
+            createdAt: ts ? ts.toDate() : new Date(),
+            href: data.href as string | undefined,
+          };
+        });
+        setNotifications(items);
+        setLoading(false);
+      },
+      () => {
+        // Index not yet created or permission denied — show empty gracefully
+        setNotifications([]);
+        setLoading(false);
+      }
+    );
 
     return unsub;
   }, [userId]);
