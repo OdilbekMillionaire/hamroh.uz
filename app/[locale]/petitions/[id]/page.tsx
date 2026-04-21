@@ -55,12 +55,14 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
 };
 
 export default function PetitionDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params?.id ?? "";
   const locale = useLocale();
   const [activeTab, setActiveTab] = useState<"overview" | "timeline" | "messages">("overview");
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
-  const petition = MOCK_PETITION; // TODO: fetch by id from Firestore
+  // TODO: fetch real petition from Firestore by id
+  const petition = MOCK_PETITION;
 
   const statusCfg = STATUS_CONFIG[petition.status] ?? STATUS_CONFIG.submitted;
   const StatusIcon = statusCfg.icon;

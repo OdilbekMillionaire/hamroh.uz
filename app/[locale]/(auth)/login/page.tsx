@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Phone, Mail, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { RecaptchaVerifier, signInWithPhoneNumber, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import type { ConfirmationResult } from "firebase/auth";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
@@ -21,19 +21,20 @@ function getAuthErrorMessage(error: unknown) {
       ? String((error as { code?: unknown }).code)
       : "";
 
-  if (code === "auth/invalid-phone-number") return "Please enter a valid phone number with country code.";
-  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a bit and try again.";
-  if (code === "auth/code-expired") return "This code expired. Please request a new one.";
-  if (code === "auth/invalid-verification-code") return "The verification code is not correct.";
-  if (code === "auth/quota-exceeded") return "SMS quota is exceeded for now. Try a Firebase test number or wait.";
+  if (code === "auth/invalid-phone-number") return "Invalid phone number. Use international format, e.g. +998 90 123 45 67";
+  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a few minutes and try again.";
+  if (code === "auth/code-expired") return "This code has expired. Please request a new one.";
+  if (code === "auth/invalid-verification-code") return "Incorrect verification code. Please check and try again.";
+  if (code === "auth/quota-exceeded") return "SMS limit reached. Please try again in a few minutes.";
+  if (code === "auth/network-request-failed") return "Network error. Please check your connection and try again.";
+  if (code === "auth/captcha-check-failed") return "Verification failed. Please refresh the page and try again.";
 
-  return "Firebase could not complete this request. Please try again.";
+  return "Could not send SMS. Make sure your number includes the country code (e.g. +998 for Uzbekistan).";
 }
 
 export default function LoginPage() {
   const t = useTranslations();
   const locale = useLocale();
-  const [method, setMethod] = useState<"phone" | "email">("phone");
   const [step, setStep] = useState<"input" | "otp">("input");
   const [value, setValue] = useState("");
   const [otp, setOtp] = useState("");
@@ -82,11 +83,6 @@ export default function LoginPage() {
   }
 
   async function handleSend() {
-    if (method === "email") {
-      setError("Email login is not enabled yet. Please use phone login.");
-      return;
-    }
-
     setError("");
     setLoading(true);
     try {
@@ -154,32 +150,17 @@ export default function LoginPage() {
             </div>
           )}
 
-          <div className="flex gap-2 mb-6 bg-[var(--bg-subtle)] rounded-xl p-1">
-            {(["phone", "email"] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => { setMethod(m); setStep("input"); setValue(""); }}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-all ${
-                  method === m ? "bg-white shadow-sm text-[var(--primary)]" : "text-[var(--text-muted)]"
-                }`}
-              >
-                {m === "phone" ? <Phone className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
-                {t(`auth.${m}`)}
-              </button>
-            ))}
-          </div>
-
           {step === "input" ? (
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
-                  {t(`auth.${method}`)}
+                  {t("auth.phone")}
                 </label>
                 <input
-                  type={method === "phone" ? "tel" : "email"}
+                  type="tel"
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  placeholder={method === "phone" ? "+998 90 123 45 67" : "email@example.com"}
+                  placeholder="+998 90 123 45 67"
                   className="w-full px-4 py-3 border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
                 />
               </div>
@@ -191,7 +172,7 @@ export default function LoginPage() {
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
                 {t("auth.sendOtp")}
               </button>
-              {method === "phone" && <div id="login-recaptcha-container" className="min-h-[78px]" />}
+              <div id="login-recaptcha-container" className="min-h-[78px]" />
             </div>
           ) : (
             <div className="space-y-4">

@@ -26,13 +26,20 @@ function getAuthErrorMessage(error: unknown) {
       ? String((error as { code?: unknown }).code)
       : "";
 
-  if (code === "auth/invalid-phone-number") return "Please enter a valid phone number with country code.";
-  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a bit and try again.";
-  if (code === "auth/code-expired") return "This code expired. Please request a new one.";
-  if (code === "auth/invalid-verification-code") return "The verification code is not correct.";
-  if (code === "auth/quota-exceeded") return "SMS quota is exceeded for now. Try a Firebase test number or wait.";
+  if (code === "auth/invalid-phone-number") return "Invalid phone number. Use international format, e.g. +998 90 123 45 67";
+  if (code === "auth/too-many-requests") return "Too many attempts. Please wait a few minutes and try again.";
+  if (code === "auth/code-expired") return "This code has expired. Please request a new one.";
+  if (code === "auth/invalid-verification-code") return "Incorrect verification code. Please check and try again.";
+  if (code === "auth/quota-exceeded") return "SMS limit reached. Please try again in a few minutes.";
+  if (code === "auth/network-request-failed") return "Network error. Please check your connection and try again.";
+  if (code === "auth/captcha-check-failed") return "Verification failed. Please refresh the page and try again.";
 
-  return "Firebase could not complete this request. Please try again.";
+  return "Could not send SMS. Make sure your number includes the country code (e.g. +998 for Uzbekistan).";
+}
+
+function isValidInternationalPhone(value: string) {
+  const cleaned = value.trim().replace(/\s/g, "");
+  return /^\+\d{7,15}$/.test(cleaned);
 }
 
 export default function RegisterPage() {
@@ -65,6 +72,10 @@ export default function RegisterPage() {
 
   async function handleRegister() {
     setError("");
+    if (!isValidInternationalPhone(phone)) {
+      setError("Please enter your phone number with country code (e.g. +998 90 123 45 67)");
+      return;
+    }
     setLoading(true);
     try {
       auth.languageCode = locale === "uz-cyrl" ? "uz" : locale;
@@ -156,7 +167,7 @@ export default function RegisterPage() {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+998 90 123 45 67"
+                    placeholder="+998 90 123 45 67 (include country code)"
                     className="w-full pl-10 pr-4 py-3 border border-[var(--border)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all"
                   />
                 </div>

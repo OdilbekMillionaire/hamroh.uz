@@ -28,7 +28,7 @@ export default function SecurityMap() {
           {t("title")}
         </h1>
         <p className="text-[var(--text-secondary)] text-sm mt-1">
-          AI-powered daily safety intelligence — updated every 24 hours
+          AI-powered safety intelligence for Uzbek citizens abroad
         </p>
       </div>
 
